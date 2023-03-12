@@ -1,8 +1,9 @@
 # Qlik-Deployment-Framework (QDF)
 **QDF version 1.8**
-Version for Qlik Cloud
-This is an early alfa with several bugs and limitations in Qlik Cloud. 
-* Shared container is a must and need to be mapped within the reload script, as seen below:
+QDF scripts for Qlik Cloud
+This is an early alfa with several bugs and limitations in Qlik Cloud. Use standard QDF containers and replace the scripts whith these. These scripts are speciffic for Qlik Cloud, meaning that you can not run Qlik Sense desktop, QlikView or Qlik Sense server together with these scripts.
+
+* Shared container is a must and need to be mapped within the Qlik Sense reload script, as seen below:
     SET vG.SharedBasePath='lib://Drive name/path/Shared';
     $(include=$(vG.SharedBasePath)/InitLink.qvs);
 * In this release all container folders in external drives (folders you want QDF to identify as Global Variable path) need to include the **Info.txt** file, as this file identifies the folder as a Global path
