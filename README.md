@@ -1,6 +1,5 @@
-# Qlik-Deployment-Framework (QDF) for Qlik Cloud
+# Qlik-Deployment-Framework (QDF) for Qlik Cloud (v.1.8 alfa)
 These scripts are speciffic for Qlik Cloud, meaning that you can not run Qlik Sense desktop, QlikView or Qlik Sense server together with these scripts.
-**QDF version 1.8**
 This is an early alfa with several bugs and limitations in Qlik Cloud. Use standard QDF containers and replace the scripts whith these.  All QDF functions are loaded in during initiation but not all of functions are tested to work with Qlik Cloud.
 
 * Shared container is a must and need to be mapped within the Qlik Sense reload script, as seen below:
