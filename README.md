@@ -1,5 +1,14 @@
 # Qlik-Deployment-Framework (QDF)
-**QDF version 1.7.5**
+**QDF version 1.8**
+Version for Qlik Cloud
+This is an early alfa with several bugs and limitations in Qlik Cloud. 
+* Shared container is a must and need to be mapped within the reload script, as seen below:
+    SET vG.SharedBasePath='lib://Drive name/path/Shared';
+    $(include=$(vG.SharedBasePath)/InitLink.qvs);
+* In this release all folders in external drives need the Info.txt file to be identified as a Global variable
+* external drives are really picky on trailing slash, for OneDrive no trailing slash is possible
+* To identify containers stored in external drives, the base URL need to be specified in vG.SharedBaseVariablePath/ContainerMap.csv
+* To identify spaces as containers just add the space name under vG.SharedBaseVariablePath/ContainerMap.csv
 
 ## QDF is a set of Qlik scripts and utilities that enables: 
 Resource Sharing, Reuse, Organization, Structure and Standards providing an effective and efficient Qlik deployment.
