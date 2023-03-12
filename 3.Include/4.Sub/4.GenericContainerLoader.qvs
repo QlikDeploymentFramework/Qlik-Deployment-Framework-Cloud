@@ -28,27 +28,30 @@ endif
 call LoadContainerMap('$(vG.SharedBaseVariablePath)/ContainerMap.csv','$(vL.QDF.ContainerName)'); // Using LoadContainerMap with special switches the Container links will be populated automatically
 
 // Base Search Path $(vG.BasePath) for this container
-if '$(vL.RootPath)'='' then // Use spaces as containers
+if '$(vL.RootPath)'= '' then // Use spaces as containers
 		SET vG.$(vL.QDF.Alias)BasePath = 'lib://$(vL.ContainerFolderName):';
 		SET vG.$(vL.QDF.Alias)QVDPath = '$(vG.$(vL.QDF.Alias)BasePath)DataFiles'; 
-	elseif not IsNull(filesize('$(vL.RootPath)$(vL.ContainerFolderName)/InitLink.qvs') = -1 then // Use real containers in external storage
-
+	elseif not IsNull(filesize('$(vL.RootPath)$(vL.ContainerFolderName)/InitLink.qvs')) = -1 then // Use real containers in external storage
 		for each vL.QDF.DoDir in dirlist ('$(vL.RootPath)$(vL.ContainerFolderName)')
          let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','.',-1);
 
-			if  not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
-              LET vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)';
-           		trace 'Set Global Variable: $(vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path)';
+			if not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
+				if '$(vL.QDF.SingleFolder)'='' or '$(vL.QDF.SingleFolder)'='$(vL.QDF.Foldername)' then
+              		LET vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)';
+           			trace 'Set Global Variable: $(vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path)';
+			  	endif
                for each vL.QDF.SubDir in dirlist ('$(vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path)')
-               let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','.',-1);
-               	if  not IsNull(filesize('$(vL.QDF.SubDir)/Info.txt')) = -1 then
-                	LET vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path='$(vL.QDF.SubDir)';
-               		trace 'Set Global Variable: $(vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path)';
-                endif
+               		let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','.',-1);
+               		if not IsNull(filesize('$(vL.QDF.SubDir)/Info.txt')) = -1 then
+						if '$(vL.QDF.SingleFolder)'='' or '$(vL.QDF.SingleFolder)'='$(vL.QDF.Foldername)' then
+                			LET vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path='$(vL.QDF.SubDir)';
+               				trace 'Set Global Variable: $(vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path)';
+						endif
+                	endif
                next vL.QDF.SubDir 
                 
 			endif
-next vL.QDF.DoDir 	
+		next vL.QDF.DoDir 	
 	else 
    	trace '### QDF info, could not identify container ($(vL.RootPath)$(vL.ContainerFolderName)/InitLink.qvs)'; //Writing information in log   
 endif
