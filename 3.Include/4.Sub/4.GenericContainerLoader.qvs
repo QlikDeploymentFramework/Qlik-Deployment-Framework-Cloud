@@ -1,0 +1,87 @@
+﻿// ____________________________________________________________
+// Deployment Framework BaseVariable 4.GenericContainerLoader//
+//  All path are based on vG.BasePath                        //
+//  This script is used to connect to any container          //
+// This script should only be accessed via the LCGV function
+// SUB LCGV(‘Container Path Name’,['Optional Single Folder']);
+// Example: call LCGV('1.AcmeStore');
+//___________________________________________________________//
+
+SUB LoadContainerGlobalVariables(vL.QDF.ContainerName,vL.QDF.SingleFolder,vL.QDF.Alias);
+
+
+// Writing information in log
+trace '### QDF Info, 2.GenericContainerLoader.qvs  Started';
+
+LET vL.QDF.ContainerName=trim('$(vL.QDF.ContainerName)'); // Trim vL.QDF.ContainerName from white spaces
+
+if '$(vL.QDF.Alias)'='' then // If alias exists in container map
+	let vL.QDF.Alias= '$(vL.QDF.ContainerName)'; // No alias
+else
+	let vL.QDF.Alias= PurgeChar(trim('$(vL.QDF.Alias)'),'=;,- '&chr(39)); //this Alias replaces the prefix as global variable name
+	trace '### QDF Info, Alias: $(vL.QDF.Alias) found, will replace: $(vL.QDF.ContainerName) prefix name' ;
+endif
+
+// Load container map and variables by using LoadContainerMap function
+// vL.ContainerFolderName, vL.ContainerPathName, vL.RootPath are all retrieved from LoadContainerMap sub function
+
+call LoadContainerMap('$(vG.SharedBaseVariablePath)/ContainerMap.csv','$(vL.QDF.ContainerName)'); // Using LoadContainerMap with special switches the Container links will be populated automatically
+
+// Base Search Path $(vG.BasePath) for this container
+if '$(vL.RootPath)'='' then // Use spaces as containers
+		SET vG.$(vL.QDF.Alias)BasePath = 'lib://$(vL.ContainerFolderName):';
+		SET vG.$(vL.QDF.Alias)QVDPath = '$(vG.$(vL.QDF.Alias)BasePath)DataFiles'; 
+	elseif not IsNull(filesize('$(vL.RootPath)$(vL.ContainerFolderName)/InitLink.qvs') = -1 then // Use real containers in external storage
+
+		for each vL.QDF.DoDir in dirlist ('$(vL.RootPath)$(vL.ContainerFolderName)')
+         let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','.',-1);
+
+			if  not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
+              LET vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)';
+           		trace 'Set Global Variable: $(vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path)';
+               for each vL.QDF.SubDir in dirlist ('$(vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path)')
+               let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','.',-1);
+               	if  not IsNull(filesize('$(vL.QDF.SubDir)/Info.txt')) = -1 then
+                	LET vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path='$(vL.QDF.SubDir)';
+               		trace 'Set Global Variable: $(vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path)';
+                endif
+               next vL.QDF.SubDir 
+                
+			endif
+next vL.QDF.DoDir 	
+	else 
+   	trace '### QDF info, could not identify container ($(vL.RootPath)$(vL.ContainerFolderName)/InitLink.qvs)'; //Writing information in log   
+endif
+
+// Clean up
+// Remove local variables
+
+SET vL.ContainerFolderName=;
+SET vL.QDF.PhysicalFolderName=;
+SET vL.QDF.VariablePrefix=;
+SET vL.QDF.VariableLoop=;
+SET vL.QDF.Subfolder=;
+set vL.QDF.VariableLoop=;
+SET vL.QDF.BasePath=;
+SET vL.QDF.ContainerMapPath = ;
+SET vL.ContainerPathName=;
+SET vL.RootPath=;
+SET vL.FileExist=;
+SET vL.QDF.ContainerName=;
+SET vL.Comment =;
+SET vL.QDF.SingleFolder=;
+SET vL.QDF.SubStringSplitt=;
+SET vL.QDF.SubString=;
+SET vL.QDF.Alias=;
+end sub
+
+SUB LCGV(vL.QDF.ContainerName_tmp,vL.QDF.SingleFolder_tmp,vL.QDF.Alias_tmp); // Alias for LoadContainerGlobalVariables
+	call LoadContainerGlobalVariables('$(vL.QDF.ContainerName_tmp)','$(vL.QDF.SingleFolder_tmp)','$(vL.QDF.Alias_tmp)');
+	SET vL.QDF.ContainerName_tmp=;
+	SET vL.QDF.SingleFolder_tmp=;
+	SET vL.QDF.Alias_tmp=;
+end sub
+
+// *************************************
+// Functions written by Magnus Berg Qlik
+// *************************************

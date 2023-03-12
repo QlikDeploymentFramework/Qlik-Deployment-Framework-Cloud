@@ -1,0 +1,41 @@
+// 
+//### This script loads all sub functions in one single batch
+//### It's run automatically by 1.Init.qvs QDF during initiation
+//### $(Must_Include=$(vG.SubPath)\99.LoadAll.qvs);
+//
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\1.FileExist.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\2.LoadVariableCSV.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\3.LoadContainerMap.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\4.GenericContainerLoader.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\5.DoDir.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\6.CreateFolder.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\7.CalendarGen.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\8.QVFileInfo.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\9.QVDMigration.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\10.QVDLoad.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\11.DynamicContainerLoader.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\12.Index.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\13.NiceTrace.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\14.QVDReduce.qvs);
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\15.ETLLog.qvs);
+
+
+// Loading in Qlikview Components, source avalible on GitHub
+// https://github.com/RobWunderlich/Qlikview-Components
+// Qlikview Components (Qvc) is a library of script subroutines and functions.
+// Disable Qvc in the script (before QDF initiation) setting the vG.QVCDisable=true flag 
+
+
+// Section below is when integrating QVC and is disabled default. Enable QVC in Deploy Tool to activate this section
+//if trim(lower('$(vG.QVCDisable)'))='true' then // This is used to disable/enable QlikView Components library (Qvc)
+//
+//	 set vG.QVCDisable='$(vG.$(vL.QDF.SharedInclude)SubPath)'; // vG.QVCDisable = true removes Qvc.qvs filename
+//else
+//	set vG.QVCDisable='$(vG.$(vL.QDF.SharedInclude)SubPath)Qvc.qvs'; // Not disabled will state the Qvc.qvs filename	
+//endif
+//
+//$(Include=$(vG.QVCDisable)); 
+
+// *************************************
+// Functions written by Magnus Berg Qlik
+// *************************************

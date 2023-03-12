@@ -1,0 +1,132 @@
+// ____________________________________________________________________________
+ //   Qlik Deployment Framework SUBVariable 2.LoadVariableCSV.qvs    
+ // SUB routine used for loading variables stored in csv files into the QlikView Script
+ // Execute (Call) the Sub in the script, by first include the script in the beginning:
+ // $(Include=$(vG.SubPath)\2.LoadVariableCSV.qvs);
+ // and then use:
+ // call LoadVariableCSV('CSV_My Tables.csv', ,Optional vL.SpecificVariable or Tag,  Optional Use Comments as Variables, Optional Specify table name, will keep the table after load);
+ // Mandatory switch is csv path and file 'CSV_My Tables.csv'
+ // And Container base Variables will be loaded based on ContainerMap.csv
+
+SUB LoadVariableCSV(vL.QDF.CVSTableName,vL.QDF.SpecificVariable,vL.QDF.ContainerName,vL.QDF.CommentsAsVariables);
+//$(Include=$(vG.SubPath)\1.FileExist.qvs);
+//$(Include=$(vG.SubPath)\5.DoDir.qvs);
+call vL.FileExist ('$(vL.QDF.CVSTableName)');
+
+ // Loading CSV table based on vL.QDF.CVSTableName variables.
+if not '$(vL.QDF.ContainerName)'='' and not '$(vL.QDF.CVSTableName)'='' then //If a container entry is used find this in the container map
+	call LoadContainerGlobalVariables('$(vL.QDF.ContainerName)','BaseVariable');
+	call vL.FileExist ('$(vG.$(vL.QDF.ContainerName)BaseVariablePath)$(vL.QDF.CVSTableName)');
+	
+	if vL.FileExist = 'true' then
+		Let vL.QDF.CVSTableName='$(vG.$(vL.QDF.ContainerName)BaseVariablePath)$(vL.QDF.CVSTableName)';
+	endif
+
+endif
+
+if vL.FileExist = 'true'  then  
+
+	//trace '### QDF Starting LoadVariableCSV';
+
+	[vL.temp_table]:
+
+	REPLACE LOAD *
+	FROM
+	[$(vL.QDF.CVSTableName)]
+		(txt, utf8, embedded labels, delimiter is ',', msq);
+
+	//loop through CSV table entries in search for LET and SET expression
+	let vL.QDF.To_loop = NoOfRows('vL.temp_table');
+
+	for vL.QDF.From_loop = 0 to vL.QDF.To_loop-1
+	
+		LET vL.QDF.VariableField = PurgeChar(trim(peek(FieldName(1,'vL.temp_table'),$(vL.QDF.From_loop),'vL.temp_table')),'=;,-"'&chr(39)); // Find variable field remove unused characters (=;)
+
+		// If values are blank no point in going to Switch
+		if not '$(vL.QDF.VariableField)'='' then
+
+			LET vL.QDF.TableUpper = upper(trim(left('$(vL.QDF.VariableField)',4))); // Grab LET or SET commands from variable field
+			LET vL.QDF.Variable = PurgeChar(subfield(trim('$(vL.QDF.VariableField)'), ' ' ,2),';,'&chr(39)); // Grab Variable from variable field 
+			LET vL.QDF.Commentfield = PurgeChar(peek(FieldName(3,'vL.temp_table'),$(vL.QDF.From_loop),'vL.temp_table'),';,'&chr(39)); // Load Comment Field, remove unused characters 
+			LET vL.QDF.Tag = ','&PurgeChar(trim(peek(FieldName(4,'vL.temp_table'),$(vL.QDF.From_loop),'vL.temp_table')),';'&chr(39))&','; // Load Tag Field remove unused characters
+
+
+			// Validate if Tag is available
+			if trim('$(vL.QDF.SpecificVariable)') = '$(vL.QDF.Tag)' or '$(vL.QDF.SpecificVariable)'='' then
+			
+				// Check for SET or LET expressions 
+				switch '$(vL.QDF.TableUpper)'
+				case 'LET' 
+				LET $(vL.QDF.Variable) = evaluate(peek(FieldName(2,'vL.temp_table'),$(vL.QDF.From_loop),'vL.temp_table')); // Evaluate LET variables
+				if IsNull($(vL.QDF.Variable)) = -1 then // If evaluate do not work try other method
+					LET $(vL.QDF.Variable) = peek(FieldName(2,'vL.temp_table'),$(vL.QDF.From_loop),'vL.temp_table'); // Executing SET variables
+				endif
+				//Use Comments as additional variable (_Comments prefix)
+				if lower('$(vL.CommentsAsVariables)') ='true' or lower('$(vL.QDF.CommentsAsVariables)') ='true'  then //Use Comments as additional variable (_Comments prefix)
+					if not '$(vL.QDF.Commentfield)' ='' and  not '$(vL.QDF.TableUpper)' = 'NoExecution' then // no point in creating a blank variable or variable execution not run
+						LET $(vL.QDF.Variable)_Comments = PurgeChar(peek(FieldName(3,'vL.temp_table'),$(vL.QDF.From_loop),'vL.temp_table'),'=;'&chr(39));
+					endif
+				endif
+				case 'SET'
+				LET $(vL.QDF.Variable) = peek(FieldName(2,'vL.temp_table'),$(vL.QDF.From_loop),'vL.temp_table'); // Executing SET variables
+				//Use Comments as additional variable (_Comments prefix)
+				if lower('$(vL.CommentsAsVariables)') ='true' or lower('$(vL.QDF.CommentsAsVariables)') ='true'  then //Use Comments as additional variable (_Comments prefix)
+					if not '$(vL.QDF.Commentfield)' ='' and  not '$(vL.QDF.TableUpper)' = 'NoExecution' then // no point in creating a blank variable or variable execution not run
+						LET $(vL.QDF.Variable)_Comments = PurgeChar(peek(FieldName(3,'vL.temp_table'),$(vL.QDF.From_loop),'vL.temp_table'),'=;'&chr(39));
+					endif
+				endif
+				case 'NoExecution'	
+				// No Execution will be done, this is used when executing by a tag
+				default
+				LET $(vL.QDF.VariableField) = peek(FieldName(2,'vL.temp_table'),$(vL.QDF.From_loop),'vL.temp_table'); // Executing SET variables is SET or LET not specified
+				if lower('$(vL.CommentsAsVariables)') ='true' or lower('$(vL.QDF.CommentsAsVariables)') ='true'  then //Use Comments as additional variable (_Comments prefix)
+					if not '$(vL.QDF.Commentfield)' ='' and  not '$(vL.QDF.TableUpper)' = 'NoExecution' then // no point in creating a blank variable or variable execution not run
+						LET $(vL.QDF.VariableField)_Comments = PurgeChar(peek(FieldName(3,'vL.temp_table'),$(vL.QDF.From_loop),'vL.temp_table'),'=;'&chr(39));
+					endif
+				endif
+				end switch	
+		
+
+			endif;
+
+			SET vL.QDF.TableUpper = ; // Reset TableUpper after every iteration
+			SET vL.QDF.TableUpper_tmp = ;
+
+			SET vL.QDF.Commentfield =''; // Reset comment entries 
+
+		endif
+
+	next
+
+	Drop table [vL.temp_table];
+	//Resetting variables
+	SET vL.QDF.From_loop = ;
+	SET vL.QDF.To_loop = ;
+	SET vL.QDF.Tag =;
+	SET vL.QDF.VariableField= ;
+	SET vL.QDF.Variable = ;
+	SET vL.QDF.Valuefield = ;	
+	SET vL.QDF.Commentfield = ;
+	SET vL.QDF.AltRootFolderPath = ;
+	SET vL.QDF.CVSTableName = ;
+	SET vL.QDF.SpecificVariable = ;
+	SET vL.QDF.CommentsAsVariables = ;
+	SET vL.QDF.ContainerName = ;
+	SET vL.QDF.DoDir_Tmp_Tbl = ;
+	SET vL.QDF.DoDir_Tmp_Tbl_2 = ;
+	SET vL.QDF.CVSTableNameOrig = ;
+	SET vL.QDF.filelist_tmp = ;
+
+	// Writing information in log
+	trace '### QDF Info, LoadVariableCSV done';
+else
+	trace '### QDF Info, Did not find $(vL.QDF.CVSTableName), exit LoadVariableCSV';
+endif;
+SET vL.FileExist = ;
+end sub
+
+
+// **********************************
+// Function written by Magnus Berg
+// QlikView International AB
+// **********************************

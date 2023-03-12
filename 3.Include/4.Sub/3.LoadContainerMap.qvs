@@ -1,0 +1,90 @@
+// ____________________________________________________________________________
+ // SUB routine loading csv Container Map into a QlikView Script, is primarily used by 4.GenericContainerLoader.qvs
+ // Execute (Call) the Sub in the script by first include the script in the beginning and then use:
+ // call LoadContainerMap('container map csv', 'Name of Container to link');
+ // Container base Variables will be loaded based on ContainerMap.csv
+ // will return vL.ContainerPathName vL.ContainerFolderName vL.Comment vL.RootPath 
+
+SUB LoadContainerMap(vL.QDF.ContainerMapPath,vL.QDF.SpecificVariable);
+
+//Reset vL.LoadContainerMapCount variable used to identify if two or more identical Variable Prefix exist
+SET vL.LoadContainerMapCount=;
+SET vL.QDF.ValidatedBasePath=;
+
+// Loading Container Map csv table as vL.temp_table_map
+
+unqualify ContainerPathName,Prefix,ContainerPathNameCount ; 
+vL.temp_table_map:
+REPLACE LOAD *
+FROM
+'$(vL.QDF.ContainerMapPath)'
+(txt, utf8, embedded labels, delimiter is ',', msq);
+
+LET vL.ContainerPathName = FieldName(1,'vL.temp_table_map'); // ContainerPathName variable field (Tag)
+
+// count(ContainerPathName) to find if more than one ContainerPathName is used
+REPLACE Left join
+Load $(vL.ContainerPathName),count($(vL.ContainerPathName)) as ContainerPathNameCount
+Resident vL.temp_table_map 
+group by $(vL.ContainerPathName); 
+
+// loop through CSV table entries in search for LET and SET expresion
+let vL.QDF.To_Loop = NoOfRows('vL.temp_table_map');
+
+for vL.QDF.From_Loop = 0 to vL.QDF.To_Loop-1
+	
+	//LET vL.Comment =''; //reset comment entries 	
+	LET vL.ContainerPathName = PurgeChar(trim(peek(FieldName(1,'vL.temp_table_map'),$(vL.QDF.From_Loop),'vL.temp_table_map')),'=;,- '&chr(39)); // ContainerPathName variable field (Tag)
+	LET vL.ContainerFolderName = PurgeChar(trim(peek(FieldName(2,'vL.temp_table_map'),$(vL.QDF.From_Loop),'vL.temp_table_map')),'=;,'&chr(39)); // ContainerFolderName field
+	LET vL.Comment = PurgeChar(trim(peek(FieldName(3,'vL.temp_table_map'),$(vL.QDF.From_Loop),'vL.temp_table_map')),';,'&chr(39)); // Comment Field 
+	LET vL.RootPath = PurgeChar(trim(peek(FieldName(4,'vL.temp_table_map'),$(vL.QDF.From_Loop),'vL.temp_table_map')),'=;,'&chr(39)); // RootPath other than default
+	LET vL.QDF.ContainerPathNameCount = peek(FieldName(5,'vL.temp_table_map'),$(vL.QDF.From_Loop),'vL.temp_table_map');
+	
+	// Do not do anything if row is empty
+	if not '$(vL.ContainerPathName)' = '' and not '$(vL.ContainerFolderName)' = '' then
+	
+
+		if left(trim('$(vL.RootPath)'),2) ='//' or index('$(vL.RootPath)', ':')>0  then // If vL.AltRootPath have a valid path
+
+				if not right('$(vL.RootPath)' , 1 ) ='/' then // Check and add '/' in root path
+					let vL.RootPath ='$(vL.RootPath)'&'/';
+				endif;
+			else
+				let vL.RootPath =;
+		endif;
+	
+		// Finding vL.QDF.SpecificVariable and return values from Container Map
+		if ('$(vL.QDF.SpecificVariable)'='$(vL.ContainerPathName)' or '$(vL.QDF.SpecificVariable)'='$(vL.ContainerFolderName)')  then
+		
+		
+			if vL.QDF.ContainerPathNameCount = 1 then // If only one container Path exists then exit 
+				SET vL.QDF.Exit= 'True'; // Exit For Loop
+				
+				else // Several container Path exists, send error message
+				Trace '### QDF Warning, found duplication of $(vL.ContainerPathName), please correct';
+				//Reset vL.LoadContainerMapCount variable used to identify if two or more identical Variable Prefix exist
+				SET vL.LoadContainerMapCount='$(vL.ContainerPathName)';
+				SET vL.QDF.Exit= 'True'; // Exit For Loop
+			endif
+			exit for when '$(vL.QDF.Exit)'='True';
+		endif;
+		exit for when '$(vL.QDF.Exit)'='True';	
+	endif;
+next;
+
+drop table 'vL.temp_table_map'; // Dropping CSV Table after variables been read into the QlikView application
+
+//Resetting variables
+SET vL.QDF.From_Loop = ;
+SET vL.QDF.To_Loop = ;
+SET vL.QDF.SpecificVariable = ;
+SET vL.QDF.Exit= ;
+SET vL.QDF.ContainerPathNameCount= ;
+SET vL.QDF.ValidatedBasePath=;
+SET vL.QDF.ContainerMapPath=;
+end sub
+
+// **********************************
+// Function written by Magnus Berg
+// QlikView International AB
+// **********************************

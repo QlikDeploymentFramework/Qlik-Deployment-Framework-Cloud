@@ -1,0 +1,12 @@
+//  ____________________________________________________________
+// |      Deployment Framework Path Info txt                   |
+// | Contains information folder purpose and base variable     |
+// |  All path are based on vG.BasePath                        |
+// |___________________________________________________________|
+
+// vG.CustomPath points to 3.Include\6.Custom
+
+// To store Include files that doesn’t fit any other folder = $(vG.CustomPath)
+
+Global Variable = vG.CustomPath
+Shared Global Variable= vG.SharedCustomPath

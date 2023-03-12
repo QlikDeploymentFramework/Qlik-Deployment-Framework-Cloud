@@ -1,0 +1,21 @@
+/*  ___________________________________________________________________________
+   | Qlik Deployment Framework InitLinkSkip.qvs    
+   | InitLinkSkip.qvs is used to shorten script complexity when developing, 
+   | will only work after previously successful initiation                                       
+   | InitLinkSkip is used to bypass 1.Init.qvs for QlikView and Qlik Sense               
+   |___________________________________________________________________________*/
+trace '### QDF Info, InitLinkSkip check if vG.BasePath exists'; //Writing information in log 
+
+if not IsNull(filesize('$(vG.SharedBasePath)/InitLink.qvs')) = -1  then 
+SET vL.QDF.SharedInclude='Shared';
+elseif not IsNull(filesize('$(vG.BasePath)/InitLink.qvs')) = -1 then
+SET vL.QDF.SharedInclude='';
+else 
+    trace '### QDF warning, InitLink could not identify vG.Include path'; //Writing information in log   
+	trace '### QDF Warning, use InitLink.qvs to generate global variables';
+endif
+
+// 99.LoadAll.qvs pre-loads QDF function-library within current container
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\99.LoadAll.qvs); 
+
+//SET vL.QDF.SharedInclude=; // Cleanup, 

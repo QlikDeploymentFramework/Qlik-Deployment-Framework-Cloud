@@ -1,0 +1,59 @@
+;
+/*  ___________________________________________________________________________
+   | Qlik Deployment Framework InitLink.qvs    
+   | InitLink.qvs is the container identifier                                      
+   | InitLink is used as "sling shot" to 1.Init.qvs for QlikView and Qlik Sense               
+   |___________________________________________________________________________*/
+   
+trace '### QDF Info, InitLink trying to link to initiation script'; //Writing information in log 
+
+// Cleanup, Removing old Path Value
+SET vG.RootPath=; // does not exist in SaaS
+SET vG.BasePath=; // reset setting
+
+// Creating function vL.GettContainerStructure for vL.ContainerStructure table containing sub folders,
+// variable path to main folders based on this include file
+
+
+//Set global variables for include scripts
+//Determin if it's shared scripts used, by setting vG.SharedInclude or vG.Include in script initiaiton
+//Exot script if Include variable not identified 
+
+if not IsNull(filesize('$(vG.SharedBasePath)/InitLink.qvs')) = -1  then 
+   SET vL.QDF.SharedInclude='Shared'; // Set Initlink to shared space used in cloud
+else 
+   trace '### QDF info, InitLink could not identify vG.BasePath'; //Writing information in log   
+endif
+
+
+//Set global variables for BasePath related to the space the app is executing from
+SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
+SET vG.QVDPath= '$(vG.BasePath)DataFiles';
+
+for each vL.QDF.DoDir in dirlist ('$(vG.SharedBasePath)')
+         let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','.',-1);
+
+          trace '$(vL.QDF.Foldername)';
+			if  not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
+              LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)';
+              trace 'Set Global Variable: $(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)';
+               for each vL.QDF.SubDir in dirlist ('$(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)')
+               let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','.',-1);
+               	if  not IsNull(filesize('$(vL.QDF.SubDir)/Info.txt')) = -1 then
+                	LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.SubDir)';
+               		trace 'Set Global Variable: $(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)';
+                endif
+               next vL.QDF.SubDir 
+                
+			endif
+next vL.QDF.DoDir 	
+
+SET vL.QDF.Foldername =;
+SET vL.QDF.DoDir=;
+SET vL.QDF.SubDir=;
+
+$(Include=$(vG.SharedBaseVariablePath)/1.Init.qvs); // Initiate QDF for Qlik Cloud
+
+
+
+  

@@ -1,0 +1,40 @@
+
+  // Create Folder function will create folder (if non existing) or folder structure. 
+  // First include the script: $(Include=$(vG.SubPath)\6.CreateFolder.qvs);
+  //  After execute (call) the Sub CreateFolder inside the script.
+  //  sub CreateFolder (vL.FolderName) vL.FolderName Is the folder name or folder structure to create
+  //  Example: call CreateFolder ('$(vG.QVDPath)\NorthWind'); // Will create NorthWind folder under vG.QVDPath
+
+
+SUB CreateFolder (vL.QDF.FolderName_1);
+$(Include=$(vG.SubPath)\1.FileExist.qvs);
+
+// Remove slash in end
+do while right( '$(vL.QDF.FolderName_1)' , 1 ) ='/'
+			let vL.QDF.FolderName_1 =left('$(vL.QDF.FolderName_1)',len('$(vL.QDF.FolderName_1)')-1);
+			exit do unless right( '$(vL.QDF.FolderName_1)' , 1 ) ='/';
+loop ;
+
+call vL.FileExist ('$(vL.QDF.FolderName_1)/Info.txt'); // Only execute on non-existing folder
+
+if vL.FileExist = 'false' then // If Folder do not exist it will be created. 
+
+vL.QDF.CreateFolder:
+	REPLACE LOAD * INLINE [//This file is created under QDF CreateFolder() function created folders];
+    store * from [vL.QDF.CreateFolder] into '$(vL.QDF.FolderName_1)/Info.txt' (txt,delimiter is ';' );
+    drop table [vL.QDF.CreateFolder];
+
+  trace '### QDF Info, Created ' '$(vL.QDF.FolderName_1)/Info.txt';
+else
+  trace '### QDF Info, folder already exists';
+endif
+
+SET vL.QDF.FolderName_1= ;
+SET vL.QDF.FolderName_2= ;
+SET vL.QDF.FolderName_3= ;
+SET vL.QDF.FolderIndex_tmp= ;
+end sub
+
+// *************************************
+// Functions written by Magnus Berg Qlik
+// *************************************

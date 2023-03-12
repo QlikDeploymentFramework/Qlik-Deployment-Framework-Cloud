@@ -1,0 +1,91 @@
+// __________________________________________________________
+//  Qlik Deployment Framework BaseVariable 1.Init.qvs         
+//  This Include populates global variables            
+//  All global path are based on vG.BasePath that is identified first                        
+//  ___________________________________________________________
+
+trace '### QDF Info, Initiation Started'; // Writing information in QlikView application log
+
+
+// set vL.QDF.LoadCustom to variable csv file name, default 'Custom.Variables.csv'
+// Remark or blank vL.QDF.LoadCustom to skip loading Variables during initiation
+set vL.QDF.LoadCustom='Custom.Variables.csv';
+
+
+//Set global variables for include scripts
+//Determin if it's shared scripts used, by setting vG.SharedInclude or vG.Include in script initiaiton
+//Exot script if Include variable not identified
+
+if  '$(vG.BasePath)'= '' and not IsNull(filesize('$(vG.SharedBasePath)/InitLink.qvs')) = -1  then  //If no vG. BasePath idenitfied then initiate
+
+ // To link Shared_Folders directly into 1.init.qvs set vL.QDF.SharedInclude = 'Shared' (link name)
+// Leave vL.QDF.SharedInclude blank to skip linking to shared folders
+   SET vL.QDF.SharedInclude='Shared'; // Set Initlink to shared space used in cloud
+
+//Set global variables for BasePath related to the space the app is executing from
+SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
+SET vG.QVDPath= '$(vG.BasePath)DataFiles';
+
+for each vL.QDF.DoDir in dirlist ('$(vG.SharedBasePath)')
+         let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','.',-1);
+
+          trace '$(vL.QDF.Foldername)';
+			if  not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
+              LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)';
+              trace 'Set Global Variable: $(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)';
+               for each vL.QDF.SubDir in dirlist ('$(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)')
+               let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','.',-1);
+               	if  not IsNull(filesize('$(vL.QDF.SubDir)/Info.txt')) = -1 then
+                	LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.SubDir)';
+               		trace 'Set Global Variable: $(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)';
+                endif
+               next vL.QDF.SubDir 
+                
+			endif
+next vL.QDF.DoDir 	
+endif
+
+// 99.LoadAll.qvs pre-loads QDF function-library within current container
+$(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)/99.LoadAll.qvs); 
+
+// Shared_Folders Initiation
+	// Load Include for LCGV function
+	// This function is to be used inside the Qlik scripts to link between containers
+
+	// CALL LCGV('$(vL.QDF.SharedInclude)'); Not needed in cloud as shared is allways loaded as default
+
+
+// Loading Universal Variables (CustomVariable file) from shared or home Container 
+
+call LoadVariableCSV('$(vG.$(vL.QDF.SharedInclude)BaseVariablePath)/$(vL.QDF.LoadCustom)');
+
+// Initiation of 4.Custom within home or shared container
+$(Include=$(vG.$(vL.QDF.SharedInclude)BaseVariablePath)/4.Custom.qvs); // Loading 4.Custom from current container
+
+// Clean up
+// Remove local variables
+SET vG.QVCDisable=;
+SET vL.QDF.PhysicalFolderName=;
+SET vL.QDF.VariablePrefix=;
+SET vL.QDF.VariableLoop=;
+SET vL.FileExist=;
+SET vL.QDF.SharedInclude=;
+SET vL.QDF.BaseVariablePath=;
+set vL.QDF.LoadCustom=;
+set vL.RelativePath=;
+set vL.ContainerName=;
+SET vL.QDF.IncludeFolder=;
+SET vL.QDF.BaseVariableFolder=;
+SET vL.QDF.Subfolder=;
+SET vL.QDF.BasePath=;
+SET vL.QDF.BasePath_tmp=;
+SET vL.QDF.RootPath_tmp=;
+SET vL.QDF.SharedPath_tmp=;
+
+// Writing information in log
+trace '### QDF Info, 1.Init.qvs Finished';
+
+// **********************************
+// 1.Init.qvs written by Magnus Berg
+// QlikTech International AB
+// **********************************
