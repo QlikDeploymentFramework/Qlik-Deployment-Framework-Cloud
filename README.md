@@ -4,7 +4,7 @@ This is an early alfa with several bugs and limitations in Qlik Cloud. Use stand
 
 * Shared container is a must and need to be mapped within the Qlik Sense reload script, as seen below:
     - SET vG.SharedBasePath='lib://Drive name/path/Shared';
-    - $$(include=$$(vG.SharedBasePath)/InitLink.qvs);
+    - \$(include=\$(vG.SharedBasePath)/InitLink.qvs);
 * In this release all container folders in external drives (folders you want QDF to identify as Global Variable path) need to include the **Info.txt** file, as this file identifies the folder as a Global path
 * External drives are really picky on trailing slash, for OneDrive no trailing slash is possible
 * To identify containers stored in external drives, the base URL need to be specified in vG.SharedBaseVariablePath/ContainerMap.csv
