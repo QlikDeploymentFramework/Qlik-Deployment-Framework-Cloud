@@ -3,7 +3,7 @@ These scripts are speciffic for Qlik Cloud, meaning that you can not run Qlik Se
 
 This is an early alfa with several bugs and limitations in Qlik Cloud. Use standard QDF containers and replace the scripts whith these.  All QDF functions are loaded in during initiation but not all of functions are tested to work with Qlik Cloud.
 
-* **An external Shared container is a must** containing Qlik clud script version and stored under external storage. This container is need to initiate QDF using Qlik Sense reload script, as seen below:
+* **An external Shared container is a must** containing these Qlik clud script (replacing older QDF container scripts) in an external storage. This container is need to initiate QDF using Qlik Sense reload script, as seen below:
     - `SET vG.SharedBasePath='lib://Drive name/path/Shared';`
     - `$(include=$(vG.SharedBasePath)/InitLink.qvs);`
 * In this release all container folders in external drives (folders you want QDF to identify as Global Variable path) need to include the **Info.txt** file, as this file identifies the folder as a Global path
