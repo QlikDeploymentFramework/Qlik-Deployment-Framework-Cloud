@@ -1,8 +1,9 @@
 # Qlik-Deployment-Framework (QDF) for Qlik Cloud (v.1.8 alfa)
-These scripts are speciffic for Qlik Cloud, meaning that you can not run Qlik Sense desktop, QlikView or Qlik Sense server together with these scripts.
+These scripts are speciffic for Qlik Cloud, meaning that you can not run Qlik Sense desktop, QlikView or Qlik Sense server together with these scripts. Qlik Cloud spaces can be used as containers as well as clasic containers stored under external storage that is  mapped as a drive in Qlik Cloud.
+
 This is an early alfa with several bugs and limitations in Qlik Cloud. Use standard QDF containers and replace the scripts whith these.  All QDF functions are loaded in during initiation but not all of functions are tested to work with Qlik Cloud.
 
-* Shared container is a must and need to be mapped within the Qlik Sense reload script, as seen below:
+* **A Shared container containing is a must** containing Qlik clud script version and stored under external storage. This container is need to initiate QDF using Qlik Sense reload script, as seen below:
     - `SET vG.SharedBasePath='lib://Drive name/path/Shared';`
     - `$(include=$(vG.SharedBasePath)/InitLink.qvs);`
 * In this release all container folders in external drives (folders you want QDF to identify as Global Variable path) need to include the **Info.txt** file, as this file identifies the folder as a Global path
@@ -30,7 +31,7 @@ Qlik-Deployment-Framework GitHub repository contains Qlik Script code that resid
 - **InitLinkSkip.qvs** -->  InitLinkSkip.qvs removes script complexity and there by making debugging easier during developing
 - **Info.txt** --> Info file that describes the folders purpose and is used to identify that this folder should be mapped to a GlobalVariable
 - **3.Include/1.BaseVariable/1.Init.qvs** --> Main initiation script for both Qlik Sense and QlikView (run automatically by InitLink.qvs) 1.Init.qvs will validate and create global variables for the current environment and load all functions and potential custom variables.
-- **3.Include/1.BaseVariable/3.SystemVariables.qvs** --> Only for QlikView, loads system variables (filepath to logs and more)
+- **3.Include/1.BaseVariable/ContainerMap.csv** --> Contains a list of the containers identified by QDF, this list need to be up to date for QDF to work properly. Qlik Cloud spaces can be used as containers as well as real containers stored under external storage that is  mapped as a drive in Qlik Cloud
 - **3.Include/2.Locale** --> contains locale files used during initiation
 - **3.Include/4.Sub**  --> contains the most important function library, read more under README https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework/tree/master/3.Include/4.Sub
 
