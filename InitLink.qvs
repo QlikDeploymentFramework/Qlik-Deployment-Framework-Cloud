@@ -32,8 +32,6 @@ SET vG.QVDPath= '$(vG.BasePath)DataFiles';
 
 for each vL.QDF.DoDir in dirlist ('$(vG.SharedBasePath)')
          let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','.',-1);
-
-          trace '$(vL.QDF.Foldername)';
 			if  not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
               LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)';
               trace 'Set Global Variable: $(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)';
