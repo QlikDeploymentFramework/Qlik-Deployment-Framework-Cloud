@@ -11,7 +11,7 @@ This is an early alfa with several bugs and limitations in Qlik Cloud. Use stand
 * To identify spaces as containers just add the space name under `vG.SharedBaseVariablePath/ContainerMap.csv`
 * **Qlik Cloud spaces** as containers works but with limited subfoldersonly only global variables `vG.BasePath` and `vG.QVDPath` are generated and will work. 
     - Mapp QDF container -> space by adding space name in `Prefix` and `ContainerName` under `vG.SharedBaseVariablePath/ContainerMap.csv` (no `AltPath` are specified in container map)
-* Use `$(include=$(vG.SharedBasePath)/InitLinkSkip.qvs);` to skip executing the initiation code to identify related containers are, this only works when Init has run successful once before in the same location
+* Use `$(include=$(vG.SharedBasePath)/InitLinkSkip.qvs);` to skip executing the initiation code that identifies related containers, this only works when initiation has run successful once in the same location
 
 ## QDF is a set of Qlik scripts and utilities that enables: 
 Resource Sharing, Reuse, Organization, Structure and Standards providing an effective and efficient Qlik deployment.
