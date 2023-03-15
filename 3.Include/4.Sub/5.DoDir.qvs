@@ -4,10 +4,11 @@
 //  Returns a Table containing files and path in selected file system (vL.QDF.DoDirRoot)
 //  First include the DoDir Function $(Include=$(vG.SubPath)/5.DoDir.qvs);
 //  Use the function DoDir to execute. examples:
-//  call DoDir ('$(vG.RootPath)'); //Simple Example
-//  call DoDir ('$(vG.RootPath)/.qvd'); //Simple Example
+//  call DoDir ('$(vG.RootPath)'); //list all under all subfolders
+//  call DoDir ('$(vG.RootPath)/*.qvd'); // wildcard
 //  call DoDir ('$(vG.BasePath),Table Name)'); //Change Table name 
-//
+//	call DoDir ('$(vG.BasePath),'','true')'); //list only folders
+
 sub DoDir (vL.QDF.DoDirRoot,vL.QDF.DoDirTableName,vL.QDF.FoldersOnly,vL.QDF.SingleFolder,vL.QDF.QualifyFelds)
 
 let vL.QDF.DoDirRoot=trim('$(vL.QDF.DoDirRoot)'); // Trim vL.QDF.DoDirRoot
@@ -30,7 +31,7 @@ sub vL.QDF.DoDirTableName(vL.QDF.DoDirFile); //DoDir table generate sub
 	FileSize( '$(vL.QDF.DoDirFile)' ) as '$(vL.QDF.QualifyFelds)DoDirFileSize',
 	timestamp(FileTime( '$(vL.QDF.DoDirFile)' ),'$(TimestampFormat)') as '$(vL.QDF.QualifyFelds)DoDirFileTime',
 	subfield('$(vL.QDF.DoDirFile)','/',-1) as '$(vL.QDF.QualifyFelds)DoDirFileName',
-	replace(subfield('$(vL.QDF.DoDirFile)','$(vL.QDF.DoDirRoot)',-1),'//','/') as '$(vL.QDF.QualifyFelds)DoDirContainerPath',
+	right('$(vL.QDF.DoDirFile)', (len('$(vL.QDF.DoDirFile)')-len('$(vL.QDF.DoDirRoot)'))) as '$(vL.QDF.QualifyFelds)DoDirContainerPath',
 	if( lower('$(vL.QDF.FoldersOnly)')='true', '' , upper(subfield('$(vL.QDF.DoDirFile)','.',-1))) as '$(vL.QDF.QualifyFelds)DoDirFileExtension'
 autogenerate 1;
 end sub
