@@ -8,7 +8,7 @@
 //  call DoDir ('$(vG.RootPath)/.qvd'); //Simple Example
 //  call DoDir ('$(vG.BasePath),Table Name)'); //Change Table name 
 //
-sub DoDir (vL.QDF.DoDirRoot,vL.QDF.DoDirTableName,vL.QDF.FoldersOnly,vL.QDF.SingleFolder,vL.QDF.QualifyFelds,vL.QDF.Template_Exeptions)
+sub DoDir (vL.QDF.DoDirRoot,vL.QDF.DoDirTableName,vL.QDF.FoldersOnly,vL.QDF.SingleFolder,vL.QDF.QualifyFelds)
 
 let vL.QDF.DoDirRoot=trim('$(vL.QDF.DoDirRoot)'); // Trim vL.QDF.DoDirRoot
 let vL.QDF.Filename=; // remove variable (if exists)
@@ -42,15 +42,14 @@ if index('$(vL.QDF.DoDirRoot)','*')>0 and FindOneOf('$(vL.QDF.DoDirRoot)','/')>0
     LET vL.QDF.Specific_File_Type=''; // remove filetype
   endif
   let vL.QDF.Filename=left(right('$(vL.QDF.DoDirRoot)',len('$(vL.QDF.DoDirRoot)')-index('$(vL.QDF.DoDirRoot)','/',-1)),len(right('$(vL.QDF.DoDirRoot)',len('$(vL.QDF.DoDirRoot)')-index('$(vL.QDF.DoDirRoot)','/',-1)))-len('$(vL.QDF.Specific_File_Type)'));
-  LET vL.QDF.DoDirRoot= left ('$(vL.QDF.DoDirRoot)',index('$(vL.QDF.DoDirRoot)','/')); // Remove filename from path
+  LET vL.QDF.DoDirRoot= left ('$(vL.QDF.DoDirRoot)',index('$(vL.QDF.DoDirRoot)','/',-1)-1); // Remove filename from path
  	if vL.QDF.Filename= '*' then 
  		LET vL.QDF.Filename= '';
  	endif 
-  trace '$(vL.QDF.Filename) $(vL.QDF.DoDirRoot) $(vL.QDF.Specific_File_Type)';
 else 
 	LET vL.QDF.Specific_File_Type= '';
-	LET vL.QDF.Filename= '';
 endif
+LET vL.QDF.Filename= '';
 
 LET vL.QDF.DoDirRootTmp= '$(vL.QDF.DoDirRoot)';
 
@@ -61,7 +60,15 @@ endif
 sub vL.DoDirTmp (vL.QDF.DoDirRootTmp) // DoDir main Sub
 if not lower('$(vL.QDF.FoldersOnly)')='true' then // If folders only is used (vL.QDF.Specific_File_Type) do not execute vL.QDF.DoDirTableName
   for each vL.QDF.DoDirFile in filelist ('$(vL.QDF.DoDirRootTmp)') // Index Files
+		Switch right('$(vL.QDF.DoDirFile)',len('$(vL.QDF.Specific_File_Type)')) //Filter instead of using wildcards that doed not work for external drives
+		case '$(vL.QDF.Specific_File_Type)' 
 		call vL.QDF.DoDirTableName('$(vL.QDF.DoDirFile)');
+		case ''
+		call vL.QDF.DoDirTableName('$(vL.QDF.DoDirFile)');
+		default
+		
+		end switch
+  
   next vL.QDF.DoDirFile
 endif
 
@@ -96,7 +103,6 @@ SET vL.QDF.DoDirTableName =;
 SET vL.QDF.DoDirFile=;
 SET vL.QDF.DoDirRootTmp=;
 SET vL.QDF.DirTmp=;
-SET vL.QDF.Template_Exeptions=;
 SET vL.QDF.Specific_File_Type=;
 SET vL.QDF.SingleFolder=;
 SET vL.QDF.FoldersOnly=;
