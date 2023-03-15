@@ -5,7 +5,7 @@
 //  First include the DoDir Function $(Include=$(vG.SubPath)/5.DoDir.qvs);
 //  Use the function DoDir to execute. examples:
 //  call DoDir ('$(vG.RootPath)'); //Simple Example
-//  call DoDir ('$(vG.RootPath)/*.qvd'); //Simple Example
+//  call DoDir ('$(vG.RootPath)/.qvd'); //Simple Example
 //  call DoDir ('$(vG.BasePath),Table Name)'); //Change Table name 
 //
 sub DoDir (vL.QDF.DoDirRoot,vL.QDF.DoDirTableName,vL.QDF.FoldersOnly,vL.QDF.SingleFolder,vL.QDF.QualifyFelds,vL.QDF.Template_Exeptions)
@@ -42,9 +42,14 @@ if index('$(vL.QDF.DoDirRoot)','*')>0 and FindOneOf('$(vL.QDF.DoDirRoot)','/')>0
     LET vL.QDF.Specific_File_Type=''; // remove filetype
   endif
   let vL.QDF.Filename=left(right('$(vL.QDF.DoDirRoot)',len('$(vL.QDF.DoDirRoot)')-index('$(vL.QDF.DoDirRoot)','/',-1)),len(right('$(vL.QDF.DoDirRoot)',len('$(vL.QDF.DoDirRoot)')-index('$(vL.QDF.DoDirRoot)','/',-1)))-len('$(vL.QDF.Specific_File_Type)'));
-  LET vL.QDF.DoDirRoot= left ('$(vL.QDF.DoDirRoot)',index('$(vL.QDF.DoDirRoot)','/',-1)); // Remove filename from path
+  LET vL.QDF.DoDirRoot= left ('$(vL.QDF.DoDirRoot)',index('$(vL.QDF.DoDirRoot)','/')); // Remove filename from path
+ 	if vL.QDF.Filename= '*' then 
+ 		LET vL.QDF.Filename= '';
+ 	endif 
+  trace '$(vL.QDF.Filename) $(vL.QDF.DoDirRoot) $(vL.QDF.Specific_File_Type)';
 else 
-	LET vL.QDF.Specific_File_Type= '*';
+	LET vL.QDF.Specific_File_Type= '';
+	LET vL.QDF.Filename= '';
 endif
 
 LET vL.QDF.DoDirRootTmp= '$(vL.QDF.DoDirRoot)';
@@ -55,27 +60,17 @@ endif
 
 sub vL.DoDirTmp (vL.QDF.DoDirRootTmp) // DoDir main Sub
 if not lower('$(vL.QDF.FoldersOnly)')='true' then // If folders only is used (vL.QDF.Specific_File_Type) do not execute vL.QDF.DoDirTableName
-  for each vL.QDF.DoDirFile in filelist ('$(vL.QDF.DoDirRootTmp)$(vL.QDF.Filename)*$(vL.QDF.Specific_File_Type)') // Index Files
+  for each vL.QDF.DoDirFile in filelist ('$(vL.QDF.DoDirRootTmp)') // Index Files
 		call vL.QDF.DoDirTableName('$(vL.QDF.DoDirFile)');
   next vL.QDF.DoDirFile
 endif
 
 if not lower('$(vL.QDF.SingleFolder)')='true' then
-for each vL.QDF.DirTmp in dirlist ('$(vL.QDF.DoDirRootTmp)*' ) // Index folders
-	if not lower('$(vL.QDF.Template_Exeptions)')='true' then // Validate if switch to remove QDF templates/demo is activated (vL.QDF.Template_Exeptions)
-		if lower('$(vL.QDF.FoldersOnly)')='true' then // If folders only is used (vL.QDF.FoldersOnly) execute vL.QDF.DoDirTableName
-			call vL.QDF.DoDirTableName('$(vL.QDF.DirTmp)');
-		endif
-		call vL.DoDirTmp ('$(vL.QDF.DirTmp)/')
-		
-    // If vL.QDF.Template_Exeptions is true validate and ignore 0. or # on folders (used for Templates and examples) 
-	elseif num(subfield(right('$(vL.QDF.DirTmp)',(len('$(vL.QDF.DirTmp)')-len('$(vL.QDF.DoDirRootTmp)'))), '.'  , 1 )) >0 and substringcount (right('$(vL.QDF.DirTmp)',(len('$(vL.QDF.DirTmp)')-(len('$(vL.QDF.DoDirRootTmp)')+1))),'#') = 0 then
-		if lower('$(vL.QDF.FoldersOnly)')='true' then // If folders only is used (vL.QDF.FoldersOnly) execute vL.QDF.DoDirTableName
-			call vL.QDF.DoDirTableName('$(vL.QDF.DirTmp)');
-		endif
-		call vL.DoDirTmp ('$(vL.QDF.DirTmp)/')	
-	endif	
-	
+for each vL.QDF.DirTmp in dirlist ('$(vL.QDF.DoDirRootTmp)' ) // Index folders
+	if lower('$(vL.QDF.FoldersOnly)')='true' then // If folders only is used (vL.QDF.FoldersOnly) execute vL.QDF.DoDirTableName
+		call vL.QDF.DoDirTableName('$(vL.QDF.DirTmp)');
+	endif
+	call vL.DoDirTmp ('$(vL.QDF.DirTmp)')
 next vL.QDF.DirTmp
 endif
 end sub

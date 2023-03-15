@@ -8,6 +8,10 @@ trace '### QDF Info, InitLinkSkip check if vG.BasePath exists'; //Writing inform
 
 if not IsNull(filesize('$(vG.SharedBasePath)/InitLink.qvs')) = -1  then 
 SET vL.QDF.SharedInclude='Shared';
+//Set global variables for BasePath related to the space the app is executing from
+SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
+SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
+
 elseif not IsNull(filesize('$(vG.BasePath)/InitLink.qvs')) = -1 then
 SET vL.QDF.SharedInclude='';
 else 

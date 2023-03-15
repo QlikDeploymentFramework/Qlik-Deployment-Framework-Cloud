@@ -24,7 +24,7 @@ if  '$(vG.BasePath)'= '' and not IsNull(filesize('$(vG.SharedBasePath)/InitLink.
 
 //Set global variables for BasePath related to the space the app is executing from
 SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
-SET vG.QVDPath= '$(vG.BasePath)DataFiles';
+SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
 
 for each vL.QDF.DoDir in dirlist ('$(vG.SharedBasePath)')
          let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','.',-1);
