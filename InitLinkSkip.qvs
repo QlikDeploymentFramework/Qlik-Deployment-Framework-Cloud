@@ -7,10 +7,10 @@
 trace '### QDF Info, InitLinkSkip check if vG.BasePath exists'; //Writing information in log 
 
 if not IsNull(filesize('$(vG.SharedBasePath)/InitLink.qvs')) = -1  then 
-SET vL.QDF.SharedInclude='Shared';
-//Set global variables for BasePath related to the space the app is executing from
-SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
-SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
+    SET vL.QDF.SharedInclude='Shared';
+    //Set global variables for BasePath related to the space the app is executing from
+    SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
+    SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
 
 elseif not IsNull(filesize('$(vG.BasePath)/InitLink.qvs')) = -1 then
 SET vL.QDF.SharedInclude='';
@@ -22,4 +22,5 @@ endif
 // 99.LoadAll.qvs pre-loads QDF function-library within current container
 $(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\99.LoadAll.qvs); 
 
-//SET vL.QDF.SharedInclude=; // Cleanup, 
+SET vL.QDF.SharedInclude=; // Cleanup, 
+SET vvG.HomeContainer=; // Cleanup, 

@@ -1,20 +1,20 @@
 # Qlik-Deployment-Framework (QDF) for Qlik Cloud (v.1.8 alfa)
-These scripts are speciffic for Qlik Cloud, meaning that you can not run Qlik Sense desktop, QlikView or Qlik Sense server together with these scripts. Qlik Cloud spaces can be used as containers as well as clasic containers stored under external storage that is  mapped as a drive in Qlik Cloud.
+These scripts are specific for Qlik Cloud, meaning that you can not run Qlik Sense desktop, QlikView or Qlik Sense server together with these scripts. Qlik Cloud spaces can be used as containers as well as classic containers stored under external storage that is  mapped as a drive in Qlik Cloud.
 
-This is an early alfa with several bugs and limitations in Qlik Cloud. Use standard QDF containers and replace the scripts whith these.  All QDF functions are loaded in during initiation but not all of functions are tested to work with Qlik Cloud.
+This is an early alfa with several bugs and limitations in Qlik Cloud. Use standard QDF containers and replace the scripts with these.  All QDF functions are loaded in during initiation but not all of functions are tested to work with Qlik Cloud.
 
-* **An external Shared container is a must** containing these Qlik clud script (replacing older QDF container scripts) in an external storage. This container is need to initiate QDF using Qlik Sense reload script, as seen below:
-    - `SET vG.SharedBasePath='lib://Drive name/path/Shared';`
+* **An external Shared container is a must** containing these Qlik Cloud script (replacing older QDF container scripts) in an external storage. This container is need to initiate QDF using Qlik Sense reload script, using **vG.HomeContainer** as seen below:
+    - `SET vG.HomeContainer='lib://user:OneDrive - user/QDF_SaaS/Shared';`
     - `$(include=$(vG.SharedBasePath)/InitLink.qvs);`
 * In this release all container folders in external drives (folders you want QDF to identify as Global Variable path) need to include the **Info.txt** file, as this file identifies the folder as a Global path
 * External drives are really picky on trailing slash, for OneDrive no trailing slash is possible
 * To identify containers stored in external drives, the 'AltPath' to the external dirve and container root needs to be specified in `vG.SharedBaseVariablePath/ContainerMap.csv`
 * **Qlik Cloud spaces** as containers works but with limited subfolders, only global variables `vG.BasePath` and `vG.QVDPath` are generated and used. 
     - Mapp QDF container -> space by adding space name in `Prefix` and `ContainerName` under `vG.SharedBaseVariablePath/ContainerMap.csv` (no `AltPath` are specified in container map)
-* Use `$(include=$(vG.SharedBasePath)/InitLinkSkip.qvs);` to skip executing the initiation code that identifies related containers, this only works when initiation has executed successfuly one time in the same location
+* Use `$(include=$(vG.SharedBasePath)/InitLinkSkip.qvs);` to skip executing the initiation code that identifies related containers, this only works when initiation has executed successfully one time in the same location
 
 ## QDF is a set of Qlik scripts and utilities that enables: 
-Resource Sharing, Reuse, Organization, Structure and Standards providing an effective and efficient Qlik deployment.
+Resource Sharing, Reuse, Organisation, Structure and Standards providing an effective and efficient Qlik deployment.
 Qlik-Deployment-Framework content is available at https://community.qlik.com/groups/qlikview-deployment-framework
 
 ## Qlik Deployment Framework resource containers
