@@ -1,7 +1,7 @@
 ;
 /*  ___________________________________________________________________________
-   | Qlik Deployment Framework 1.Init.qvs    
-   | 1,Init.qvs is the container legacy identifier replaced with InitLink.qvs                                                   
+   | Qlik Deployment Framework InitLink.qvs    
+   | InitLink.qvs is the container identifier                                                   
    |___________________________________________________________________________*/
    
 trace '### QDF Info, Initiation Started'; // Writing information
@@ -35,10 +35,7 @@ Switch '$(vL.QDF.Home)' // identifing shared container
       SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
     default
     SET vL.QDF.SharedInclude=''; // No shared folder used do not use spaces as app basepath
-end switch
-
-	trace '$(vL.QDF.Home)';
-   
+end switch   
 
 if not IsNull(filesize('$(vG.HomeContainer)/InitLink.qvs')) = -1 then // Home container used in cloud
 
