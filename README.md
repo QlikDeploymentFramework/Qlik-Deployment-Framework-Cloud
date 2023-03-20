@@ -11,7 +11,7 @@ This is an early alfa with several bugs and limitations in Qlik Cloud. Use stand
 * To identify containers stored in external drives, the 'AltPath' to the external dirve and container root needs to be specified in `vG.SharedBaseVariablePath/ContainerMap.csv`
 * **Qlik Cloud spaces** as containers works but with limited subfolders, only global variables `vG.BasePath` and `vG.QVDPath` are generated and used. 
     - Mapp QDF container -> space by adding space name in `Prefix` and `ContainerName` under `vG.SharedBaseVariablePath/ContainerMap.csv` (no `AltPath` are specified in container map)
-* Use `$(include=$(vG.SharedBasePath)/InitLinkSkip.qvs);` to skip executing the initiation code that identifies related containers, this only works when initiation has executed successfully one time in the same location
+* Use `$(include=$(vG.HomeContainer)/InitLinkSkip.qvs);` to skip executing the initiation code that identifies related containers, this only works when initiation has executed successfully one time in the same location
 
 ## QDF is a set of Qlik scripts and utilities that enables: 
 Resource Sharing, Reuse, Organisation, Structure and Standards providing an effective and efficient Qlik deployment.
