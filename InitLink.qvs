@@ -40,12 +40,12 @@ end switch
 if not IsNull(filesize('$(vG.HomeContainer)/InitLink.qvs')) = -1 then // Home container used in cloud
 
 for each vL.QDF.DoDir in dirlist ('$(vG.HomeContainer)')
-         let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','.',-1);
+         let vL.QDF.Foldername =purgechar(subfield('$(vL.QDF.DoDir)','.',-1), '/');
 			if  not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
               LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)';
               trace 'Set Global Variable: $(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)';
                for each vL.QDF.SubDir in dirlist ('$(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)')
-               let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','.',-1);
+               let vL.QDF.Foldername =purgechar(subfield('$(vL.QDF.SubDir)','.',-1), '/');
                	if  not IsNull(filesize('$(vL.QDF.SubDir)/Info.txt')) = -1 then
                 	   LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.SubDir)';
                		trace 'Set Global Variable: $(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)';
