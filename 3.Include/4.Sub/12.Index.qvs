@@ -87,24 +87,24 @@ drop table vL.__TMP_Table_Fields ;
 let vL.QDF.IndexQVD=left('$(vL.QDF.FQFN)',len('$(vL.QDF.FQFN)')-len('$(vL.QDF.QVDFileName)')); // Create folder path only
 
 If '$(vL.QDF.ContainerPathName)' = '' then // If ContainerName blank identify container automatially 
-  call LoadContainerMap('$(vG.BaseVariablePath)\ContainerMap.csv','','$(vL.QDF.IndexQVD)');    // Call LoadContainerMap function to get current container prefix Name (vL.ContainerPathName)
+  call LoadContainerMap('$(vG.SharedBaseVariablePath)/ContainerMap.csv','$(vL.QDF.IndexQVD)');    // Call LoadContainerMap function to get current container prefix Name (vL.ContainerPathName)
 endif
 
-let vL.QDF.FolderName=replace(replace('$(vL.RelativePath)','/','\'),'\','_'); //Replace backslash (\) with underscore (_)
+let vL.QDF.FolderName=replace('$(vL.RelativePath)','\','_'); //Replace backslash (\) with underscore (_)
 
 //--- Create Index folders or filenames if using Qlik Sense---- 
 if '$(vL.QDF.IndexFolderName)' = '' then  //If no customized Index folder name is used
     let vL.QDF.IndexFolderNameNew = '$(vL.QDF.ContainerPathName)$(vL.ContainerPathName)_$(vL.QDF.FolderName)';
 
 elseif '$(vL.ContainerPathName)' = '' then // If both customized Index folder name and customized container is active
-    let vL.QDF.IndexFolderNameNew = '$(vL.QDF.ContainerPathName)_$(vL.QDF.IndexFolderName)_$(vL.QDF.FolderName)';    
+    let vL.QDF.IndexFolderNameNew = '$(vL.QDF.ContainerPathName)$(vL.QDF.IndexFolderName)_$(vL.QDF.FolderName)';    
 
 else // If customized index folder name is used
     let vL.QDF.IndexFolderNameNew = '$(vL.ContainerPathName)_$(vL.QDF.IndexFolderName)_'; 
  
 endif
 
- LET vL.QDF.ConfigPath = '$(vL.QDF.SharedConfigPath)Index\$(vL.QDF.IndexFolderNameNew)$(vL.QDF.QVDFileName).Index';
+ LET vL.QDF.ConfigPath = '$(vL.QDF.SharedConfigPath)/Index/$(vL.QDF.IndexFolderNameNew)$(vL.QDF.QVDFileName).Index';
 // Field names
 // QVDFileName,QVTableName,QVDSourcePath,QVDSourceContainerName,RelativePath,QVDTag,QVDIndexStorageName,QVDTimestamp,QVDFields,QVDTableCreator,QVDNbrRecords,QVDNbrFields
 
