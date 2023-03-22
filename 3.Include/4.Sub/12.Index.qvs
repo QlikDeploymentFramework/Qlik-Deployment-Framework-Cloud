@@ -24,7 +24,7 @@
 SUB IndexAdd(vL.QDF.IndexQVD,vL.QDF.IndexFolderName,vL.QDF.ContainerPathName,vL.QDF.TAG,vL.QDF.AltIndexPath);
 
 if not right( trim('$(vL.QDF.IndexQVD)') , 4)= '.qvd'  then // add .qvd if needed
-  let vL.QDF.IndexQVD ='$(vL.QDF.IndexQVD)*.qvd';
+  let vL.QDF.IndexQVD ='$(vL.QDF.IndexQVD)/*.qvd';
 endif
 
 Call DoDir ('$(vL.QDF.IndexQVD)', '_tmp_DoDir','','','true'); //Dir of QVD source directory
@@ -39,14 +39,13 @@ for vL.QDF.LoopFromDoDir = 0 to vL.QDF.DoDir-1
     LET vL.QDF.QVDFileName= peek('_tmp_DoDir.DoDirFileName',$(vL.QDF.LoopFromDoDir),'_tmp_DoDir'); // Get Qvd FileName
 
 if not '$(vL.QDF.AltIndexPath)' = '' then // set alternative Index path
-  call vL.FileExist ('$(vL.QDF.AltIndexPath)');
-  if '$(vL.FileExist)'='true' then
     Let vL.QDF.SharedConfigPath= '$(vL.QDF.AltIndexPath)';
     //--- Create Index base folder ---- 
-  endif
 else
-Let vL.QDF.SharedConfigPath= '$(vG.SharedConfigPath)'; // default Index path
+  Let vL.QDF.SharedConfigPath= '$(vG.SharedConfigPath)'; // default Index path
 endif
+
+trace 'Shared config path: $(vL.QDF.SharedConfigPath)';
 
 //---------------------------- Collect Meta Data using QVFileInfo ---------------
 
@@ -104,7 +103,8 @@ else // If customized index folder name is used
  
 endif
 
- LET vL.QDF.ConfigPath = '$(vL.QDF.SharedConfigPath)/Index/$(vL.QDF.IndexFolderNameNew)$(vL.QDF.QVDFileName).Index';
+
+ LET vL.QDF.ConfigPath = '$(vL.QDF.SharedConfigPath)/Index/$(vL.QDF.IndexFolderNameNew)$(vL.QDF.QVDFileName).txt';
 // Field names
 // QVDFileName,QVTableName,QVDSourcePath,QVDSourceContainerName,RelativePath,QVDTag,QVDIndexStorageName,QVDTimestamp,QVDFields,QVDTableCreator,QVDNbrRecords,QVDNbrFields
 
@@ -184,31 +184,25 @@ END SUB
 
 SUB IndexLoad(vL.QDF.IndexQVD,vL.QDF.Table,vL.QDF.IndexFolderName,vL.QDF.TAG,vL.QDF.InFields,vL.QDF.LoadIndexOnly,vL.QDF.LoadMaxRows,vL.QDF.AltIndexPath,vL.QDF.LoadExp);
 
-call vL.FileExist ('$(vL.QDF.AltIndexPath)');
-if not '$(vL.QDF.AltIndexPath)' = '' and vL.FileExist = 'true' then // validate and select Index path
-  Let vL.QDF.SharedConfigPath= '$(vL.QDF.AltIndexPath)\Index';
+
+if not '$(vL.QDF.AltIndexPath)' = '' then // validate and select Index path
+  Let vL.QDF.SharedConfigPath= '$(vL.QDF.AltIndexPath)/Index/';
 else 
-  Let vL.QDF.SharedConfigPath= '$(vG.SharedConfigPath)\Index';
+  Let vL.QDF.SharedConfigPath= '$(vG.SharedConfigPath)/Index/';
 endif
 
-If not '$(vL.QDF.IndexFolderName)' = '' then //Select specific Index to use
-  let vL.QDF.IndexFolderName=trim('$(vL.QDF.IndexFolderName)')&'*' ; //Add a backslash to Index folder name
-endif
-
-let vL.QDF.QVDIndexTable='vL.QDF.QVDIndexTable'; // Name the Index Table
+SET vL.QDF.QVDIndexTable='vL.QDF.QVDIndexTable'; // Name the Index Table
 If not '$(vL.QDF.LoadIndexOnly)'='' and not lower('$(vL.QDF.LoadIndexOnly)')='true' then // validate Index only switch also name custom index table name
   let vL.QDF.QVDIndexTable= '$(vL.QDF.LoadIndexOnly)'; // Rename Index table name
 endif
 
 
-If not '$(vL.QDF.IndexQVD)' = '' and substringcount( '$(vL.QDF.IndexQVD)' , '*') =0 then 
-  let vL.QDF.IndexQVD ='*'&'$(vL.QDF.IndexQVD)'&'*.index';
-else
-  let vL.QDF.IndexQVD ='*.index';
+If '$(vL.QDF.IndexQVD)' = '' then //if vL.QDF.IndexQVD not set manually use default
+  let vL.QDF.IndexQVD ='*.qvd.txt';
 endif
 
 //-----------------Load in Index folders ---------------------------
-Call DoDir ('$(vL.QDF.SharedConfigPath)\$(vL.QDF.IndexFolderName)', '_tmp_DoDir', 'true', '','true'); //Dir of Index directories
+Call DoDir ('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)$(vL.QDF.IndexQVD)', '_tmp_DoDir', '', '','true'); //Dir of Index directories
 //------------------------- end ------------------------------------
 
 if NoOfFields('_tmp_DoDir') >0 then // Validate if DoDir Table Exists
@@ -219,16 +213,16 @@ for vL.QDF.LoopFromDoDir = 0 to vL.QDF.DoDir -1
 
 LET vL.QDF.IndexFile = peek('_tmp_DoDir.FullyQualifiedName',$(vL.QDF.LoopFromDoDir),'_tmp_DoDir'); 
 
-if filesize('$(vL.QDF.IndexFile)\$(vL.QDF.IndexQVD)') >0 then
+trace 'Index file to load: $(vL.QDF.IndexFile)';
 
 unqualify QVDFileName,QVTableName,QVDSourcePath,QVDSourceContainerName,RelativePath,QVDTag,QVDFields,QVDNbrRecords;
 
-call vL.FileExist ('$(vL.QDF.SharedConfigPath)\IndexCache.qvd'); //Validate if cache exist
+call vL.FileExist ('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)/IndexCache.qvd'); //Validate if cache exist
 
-if vL.FileExist='true' and '$(vL.QDF.LoadIndexOnly)'='' and (floor(num(date(filetime ('$(vL.QDF.SharedConfigPath)\IndexCache.qvd')))) -3) < num(today(2 )) then
+if vL.FileExist='true' and '$(vL.QDF.LoadIndexOnly)'='' and (floor(num(date(filetime ('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)/IndexCache.qvd')))) -3) < num(today(2 )) then
 $(vL.QDF.QVDIndexTable):
 Load *
-From [$(vL.QDF.SharedConfigPath)\IndexCache.qvd] (qvd); //Load from index cache
+From [$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)/IndexCache.qvd] (qvd); //Load from index cache
 
 elseif '$(vL.QDF.LoadIndexOnly)'='' then // load less from index if loading data
 $(vL.QDF.QVDIndexTable):
@@ -242,15 +236,13 @@ $(vL.QDF.QVDIndexTable):
      QVDFields, 
      QVDNbrRecords
   FROM
-  [$(vL.QDF.IndexFile)\$(vL.QDF.IndexQVD)] (txt, utf8, embedded labels, delimiter is ';', msq);;
+  [$(vL.QDF.IndexFile)] (txt, utf8, embedded labels, delimiter is ';', msq);;
 
 else // load more if only the index should be loaded
 $(vL.QDF.QVDIndexTable): 
   LOAD *
   FROM
-  [$(vL.QDF.IndexFile)\$(vL.QDF.IndexQVD)] (txt, utf8, embedded labels, delimiter is ';', msq);;
-endif
-
+  [$(vL.QDF.IndexFile)] (txt, utf8, embedded labels, delimiter is ';', msq);;
 endif
 
 Next vL.QDF.LoopFromDoDir
@@ -464,7 +456,7 @@ else
   let vL.QDF.IndexFolderName='*$(vL.QDF.IndexFolderName)*' ; //Add wildedcard as Index folder name
 endif
 
-let vL.QDF.IndexQVD ='$(vL.QDF.IndexQVD).index'; // Add index prefix
+let vL.QDF.IndexQVD ='$(vL.QDF.IndexQVD).txt'; // Add index prefix
 
 
 //-----------------Load in Index section---------------------------
@@ -507,15 +499,15 @@ LET vL.QDF.QVDIndexStorageName = peek('QVDIndexStorageName',$(vL.QDF.LoopFromDoD
   if not '$(vL.QDF.QVDFileName)' ='' then // Delete only if a QVD name exists
 
 //----------------------- Delete Index --------------------------------
-    if FileSize('$(vL.QDF.SharedConfigPath)\$(vL.QDF.QVDIndexStorageName)$(vL.QDF.QVDFileName).Index') >0 then
-      Trace '### QDF Info, delete Index $(vL.QDF.SharedConfigPath)\$(vL.QDF.QVDIndexStorageName)$(vL.QDF.QVDFileName).Index';
+    if FileSize('$(vL.QDF.SharedConfigPath)\$(vL.QDF.QVDIndexStorageName)$(vL.QDF.QVDFileName).txt') >0 then
+      Trace '### QDF Info, delete Index $(vL.QDF.SharedConfigPath)\$(vL.QDF.QVDIndexStorageName)$(vL.QDF.QVDFileName).txt';
       execute cmd.exe /Q /C pushd ^"$(vL.QDF.SharedConfigPath)\^" & Del ^"$(vL.QDF.QVDIndexStorageName)$(vL.QDF.QVDFileName).Index^" & popd;
     else 
-      Trace '### QDF Warning, Could not find $(vL.QDF.SharedConfigPath)\$(vL.QDF.QVDIndexStorageName)$(vL.QDF.QVDFileName).Index';
+      Trace '### QDF Warning, Could not find $(vL.QDF.SharedConfigPath)\$(vL.QDF.QVDIndexStorageName)$(vL.QDF.QVDFileName).txt';
     endif
 
     //----------------------- Delete QVD --------------------------------
-    call vL.FileExist ('$(vL.QDF.SharedConfigPath)\$(vL.QDF.QVDIndexStorageName)$(vL.QDF.QVDFileName).Index');
+    call vL.FileExist ('$(vL.QDF.SharedConfigPath)\$(vL.QDF.QVDIndexStorageName)$(vL.QDF.QVDFileName).txt');
 
     if lower('$(vL._DeleteQVD)') = 'true' and vL.FileExist= 'false' then
       
