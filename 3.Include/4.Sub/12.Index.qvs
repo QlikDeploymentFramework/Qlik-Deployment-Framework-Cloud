@@ -103,8 +103,8 @@ else // If customized index folder name is used
  
 endif
 
-
- LET vL.QDF.ConfigPath = '$(vL.QDF.SharedConfigPath)/Index/$(vL.QDF.IndexFolderNameNew)$(vL.QDF.QVDFileName).txt';
+ LET vL.QDF.ConfigPath = '$(vL.QDF.SharedConfigPath)/Index/$(vL.QDF.IndexFolderNameNew)$(vL.QDF.QVDFileName).txt'; //create URL to write index file
+ let vL.QDF.ConfigPath ='lib:/'&replace(mid(trim('$(vL.QDF.ConfigPath)'),6,len('$(vL.QDF.ConfigPath)')+6),'//','/'); //Remove any redundant slash in url
 // Field names
 // QVDFileName,QVTableName,QVDSourcePath,QVDSourceContainerName,RelativePath,QVDTag,QVDIndexStorageName,QVDTimestamp,QVDFields,QVDTableCreator,QVDNbrRecords,QVDNbrFields
 
@@ -201,8 +201,26 @@ If '$(vL.QDF.IndexQVD)' = '' then //if vL.QDF.IndexQVD not set manually use defa
   let vL.QDF.IndexQVD ='*.qvd.txt';
 endif
 
+let vL.QDF.ConfigPath ='lib:/'&replace(mid(trim('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)'),6,len('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)')+6),'//','/'); //Remove any redundant slash in url
+
+
+call vL.FileExist ('$(vL.QDF.ConfigPath)/IndexCache.qvd'); //Validate if cache exist
+
+if vL.FileExist='true' and (floor(num(date(filetime ('$(vL.QDF.ConfigPath)/IndexCache.qvd')))) -3) < num(today(2 )) then
+$(vL.QDF.QVDIndexTable):
+Load *
+From [$(vL.QDF.ConfigPath)/IndexCache.qvd] (qvd); //Load from index cache
+
+else
+
+trace 'Config path: $(vL.QDF.ConfigPath)'; 
+
+let vL.QDF.ConfigPath ='lib:/'&replace(mid(trim('$(vL.QDF.ConfigPath)/$(vL.QDF.IndexQVD)'),6,len('$(vL.QDF.ConfigPath)/$(vL.QDF.IndexQVD)')+6),'//','/'); //Remove any redundant slash in url
+
+trace 'Config path: $(vL.QDF.ConfigPath)'; 
+
 //-----------------Load in Index folders ---------------------------
-Call DoDir ('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)$(vL.QDF.IndexQVD)', '_tmp_DoDir', '', '','true'); //Dir of Index directories
+Call DoDir ('$(vL.QDF.ConfigPath)', '_tmp_DoDir', '', '','true'); //Dir of Index directories
 //------------------------- end ------------------------------------
 
 if NoOfFields('_tmp_DoDir') >0 then // Validate if DoDir Table Exists
@@ -217,14 +235,7 @@ trace 'Index file to load: $(vL.QDF.IndexFile)';
 
 unqualify QVDFileName,QVTableName,QVDSourcePath,QVDSourceContainerName,RelativePath,QVDTag,QVDFields,QVDNbrRecords;
 
-call vL.FileExist ('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)/IndexCache.qvd'); //Validate if cache exist
-
-if vL.FileExist='true' and '$(vL.QDF.LoadIndexOnly)'='' and (floor(num(date(filetime ('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)/IndexCache.qvd')))) -3) < num(today(2 )) then
-$(vL.QDF.QVDIndexTable):
-Load *
-From [$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)/IndexCache.qvd] (qvd); //Load from index cache
-
-elseif '$(vL.QDF.LoadIndexOnly)'='' then // load less from index if loading data
+if '$(vL.QDF.IndexFile)'='' then
 $(vL.QDF.QVDIndexTable):
   LOAD 
     QVDFileName, 
@@ -238,17 +249,18 @@ $(vL.QDF.QVDIndexTable):
   FROM
   [$(vL.QDF.IndexFile)] (txt, utf8, embedded labels, delimiter is ';', msq);;
 
-else // load more if only the index should be loaded
+  else // load more if only the index should be loaded
 $(vL.QDF.QVDIndexTable): 
   LOAD *
   FROM
   [$(vL.QDF.IndexFile)] (txt, utf8, embedded labels, delimiter is ';', msq);;
 endif
 
+
 Next vL.QDF.LoopFromDoDir
 drop table [_tmp_DoDir];
 
-
+endif
 //----------------------- Loop Index data -------------------------
 
 if '$(vL.QDF.LoadIndexOnly)'='' and NoOfFields('$(vL.QDF.QVDIndexTable)') >0 then // If Index only swish used do not load 
@@ -381,13 +393,7 @@ Next vL.QDF.LoopFromDoDir
 drop table $(vL.QDF.QVDIndexTable); // Drop Index Table
 endif
 
-//endif
 
-
-
-else
-
-Trace '### QDF Warning, Could load Index table, probably no index exists';
 endif
 
 // Cleanup
