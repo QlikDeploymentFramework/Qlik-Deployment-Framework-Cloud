@@ -199,6 +199,11 @@ endif
 
 If '$(vL.QDF.IndexQVD)' = '' then //if vL.QDF.IndexQVD not set manually use default
   let vL.QDF.IndexQVD ='*.qvd.txt';
+
+elseif lower(right(trim('$(vL.QDF.IndexQVD)'),6)) = '.index' then // if index file is used (QSEoW, QlikView) juse this one instead 
+
+elseif not lower(right(trim('$(vL.QDF.IndexQVD)'),4)) = '.txt' then 
+  let vL.QDF.IndexQVD ='$(vL.QDF.IndexQVD)'&'.txt'; // .txt in the end is needed to allow index search 
 endif
 
 let vL.QDF.ConfigPath ='lib:/'&replace(mid(trim('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)'),6,len('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)')+6),'//','/'); //Remove any redundant slash in url

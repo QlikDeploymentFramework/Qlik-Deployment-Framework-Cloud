@@ -48,13 +48,18 @@ if index('$(vL.QDF.DoDirRoot)','*')>0 and FindOneOf('$(vL.QDF.DoDirRoot)','/')>0
   LET vL.QDF.DoDirRoot= left ('$(vL.QDF.DoDirRoot)',index('$(vL.QDF.DoDirRoot)','/',-1)-1); // Remove filename from path
  	if vL.QDF.Filename= '*' then 
  		LET vL.QDF.Filename= '';
+	else 
+	let vL.QDF.Filename=replace('$(vL.QDF.Filename)','*','');
  	endif 
 else 
 	LET vL.QDF.Specific_File_Type= '';
+	LET vL.QDF.Filename= '';
 endif
-LET vL.QDF.Filename= '';
+//vL.QDF.Filename
 
-LET vL.QDF.DoDirRootTmp= '$(vL.QDF.DoDirRoot)';
+let vL.QDF.DoDirRootTmp ='lib:/'&replace(mid(trim('$(vL.QDF.DoDirRoot)'),6,len('$(vL.QDF.DoDirRoot)')+6),'//','/'); //Remove any redundant slash in url
+
+trace 'Folder $(vL.QDF.DoDirRootTmp) Filename $(vL.QDF.Filename)' ;
 
 if lower('$(vL.QDF.FoldersOnly)')='true' then // If folders only is used (vL.QDF.FoldersOnly) execute vL.QDF.DoDirTableName to add first folder
       call vL.QDF.DoDirTableName('$(vL.QDF.DoDirRootTmp)');
@@ -63,8 +68,12 @@ endif
 sub vL.DoDirTmp (vL.QDF.DoDirRootTmp) // DoDir main Sub
 if not lower('$(vL.QDF.FoldersOnly)')='true' then // If folders only is used (vL.QDF.Specific_File_Type) do not execute vL.QDF.DoDirTableName
   for each vL.QDF.DoDirFile in filelist ('$(vL.QDF.DoDirRootTmp)') // Index Files
-		Switch right('$(vL.QDF.DoDirFile)',len('$(vL.QDF.Specific_File_Type)')) //Filter instead of using wildcards that doed not work for external drives
+		Switch right('$(vL.QDF.DoDirFile)',(len('$(vL.QDF.Filename)')+len('$(vL.QDF.Specific_File_Type)'))) //Filter instead of using wildcards that doed not work for external drives
 		case '$(vL.QDF.Specific_File_Type)' 
+		call vL.QDF.DoDirTableName('$(vL.QDF.DoDirFile)');
+		case '$(vL.QDF.Filename)'
+		call vL.QDF.DoDirTableName('$(vL.QDF.DoDirFile)');
+		case '$(vL.QDF.Filename)$(vL.QDF.Specific_File_Type)' 
 		call vL.QDF.DoDirTableName('$(vL.QDF.DoDirFile)');
 		case ''
 		call vL.QDF.DoDirTableName('$(vL.QDF.DoDirFile)');
