@@ -196,7 +196,6 @@ If not '$(vL.QDF.LoadIndexOnly)'='' and not lower('$(vL.QDF.LoadIndexOnly)')='tr
   let vL.QDF.QVDIndexTable= '$(vL.QDF.LoadIndexOnly)'; // Rename Index table name
 endif
 
-
 If '$(vL.QDF.IndexQVD)' = '' then //if vL.QDF.IndexQVD not set manually use default
   let vL.QDF.IndexQVD ='*.qvd.txt';
 
@@ -205,9 +204,11 @@ elseif lower(right(trim('$(vL.QDF.IndexQVD)'),6)) = '.index' then // if index fi
 elseif not lower(right(trim('$(vL.QDF.IndexQVD)'),4)) = '.txt' then 
   let vL.QDF.IndexQVD ='$(vL.QDF.IndexQVD)'&'.txt'; // .txt in the end is needed to allow index search 
 endif
-
-let vL.QDF.ConfigPath ='lib:/'&replace(mid(trim('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)'),6,len('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)')+6),'//','/'); //Remove any redundant slash in url
-
+If '$(vL.QDF.IndexFolderName)' = '' then  //Add vL.QDF.IndexFolderName if pressent
+  let vL.QDF.ConfigPath ='lib:/'&replace(mid(trim('$(vL.QDF.SharedConfigPath)/*'),6,len('$(vL.QDF.SharedConfigPath)/*')+6),'//','/'); //Remove any redundant slash in url
+else
+  let vL.QDF.ConfigPath ='lib:/'&replace(mid(trim('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)_'),6,len('$(vL.QDF.SharedConfigPath)/$(vL.QDF.IndexFolderName)_')+6),'//','/'); //Remove any redundant slash in url
+endif
 
 call vL.FileExist ('$(vL.QDF.ConfigPath)/IndexCache.qvd'); //Validate if cache exist
 
@@ -218,11 +219,7 @@ From [$(vL.QDF.ConfigPath)/IndexCache.qvd] (qvd); //Load from index cache
 
 else
 
-trace 'Config path: $(vL.QDF.ConfigPath)'; 
-
-let vL.QDF.ConfigPath ='lib:/'&replace(mid(trim('$(vL.QDF.ConfigPath)/$(vL.QDF.IndexQVD)'),6,len('$(vL.QDF.ConfigPath)/$(vL.QDF.IndexQVD)')+6),'//','/'); //Remove any redundant slash in url
-
-trace 'Config path: $(vL.QDF.ConfigPath)'; 
+let vL.QDF.ConfigPath ='lib:/'&replace(mid(trim('$(vL.QDF.ConfigPath)$(vL.QDF.IndexQVD)'),6,len('$(vL.QDF.ConfigPath)$(vL.QDF.IndexQVD)')+6),'//','/'); //Remove any redundant slash in url
 
 //-----------------Load in Index folders ---------------------------
 Call DoDir ('$(vL.QDF.ConfigPath)', '_tmp_DoDir', '', '','true'); //Dir of Index directories
