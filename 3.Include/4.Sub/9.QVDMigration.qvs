@@ -27,11 +27,6 @@ end if
 
 LET vL.QDF.Scramble_fields=','&'$(vL.QDF.Scramble_fields)'&','; // Adding (,) to identify fields in loop, uses (,) as field separators
 
-if lower('$(vL.QDF.IncludeSubFolders)')='true' then // Change vL.QDF.IncludeSubFolders = true to false to parse into DoDir use single folder (default multiple folders)
-	let vL.QDF.IncludeSubFolders='';
-else
-	let  vL.QDF.IncludeSubFolders='true';
-endif
 
 //Limit amount of records
 if vL.QDF.NoRecords > 0 then 
@@ -42,12 +37,14 @@ endif
 
 switch upper(subfield(trim('$(vL.QDF.MigrationSource)'),'/',-1)) // change vL.QDF.MigrationSource depending on how users write 
 	case ''
-	let vL.QDF.MigrationSource= trim('$(vL.QDF.MigrationSource)')&'*.qvd';
+	let vL.QDF.MigrationSource= trim('$(vL.QDF.MigrationSource)')&'/*.qvd';
 	case '*'
-	let vL.QDF.MigrationSource= trim('$(vL.QDF.MigrationSource)')&'.qvd';
+	let vL.QDF.MigrationSource= trim('$(vL.QDF.MigrationSource)')&'/.qvd';
 	default
-	let vL.QDF.IncludeSubFolders=''; // only one file no need to use subfolders
+	let vL.QDF.MigrationSource= trim('$(vL.QDF.MigrationSource)')&'/*.qvd';
 end switch
+
+let vL.QDF.MigrationSource ='lib:/'&replace(mid(trim('$(vL.QDF.MigrationSource)'),6,len('$(vL.QDF.MigrationSource)')+6),'//','/'); //Remove any redundant slash in url
 
 call DoDir ('$(vL.QDF.MigrationSource)','__vL.DoDir_TMP','','$(vL.QDF.IncludeSubFolders)','true'); // Cal DoDir sub function
 
@@ -64,6 +61,7 @@ call QVFileInfo ('$(vL.QDF.filelist_tmp)','__vL.FileInfo_TMP'); // get QVD file 
 
 LET vL.QDF.QVTableName=subfield(peek('QVTableName',0,'__vL.FileInfo_TMP'),'/',-1);
 LET vL.QDF.QVDTag = peek('QVTableComment',0,'__vL.FileInfo_TMP');
+LET vL.QDF.FileName= peek('QVFileName',0,'__vL.FileInfo_TMP');
 
 if not '$(vL.QDF.QVTableName)' = '' then 
 
@@ -91,32 +89,32 @@ if not '$(vL.QDF.QVTableName)' = '' then
 	// Remove (,) in back of the lastconcatenated statement
 	LET vL.QDF.Store_Select_new= left(trim('$(vL.QDF.Store_Select_new)'),(len( trim('$(vL.QDF.Store_Select_new)'))-1 ));
 
-	if not '$(vL.QDF.Store_Select_new)' ='' then 
+if not '$(vL.QDF.Store_Select_new)' ='' then 
 	[$(vL.QDF.QVTableName)$(vL.QDF.QVTableName_Suffix)]: // Load QVD file based on vL.QDF.Store_Select_new concatenated statement
 	$(vL.QDF.NoRecords)
 	LOAD $(vL.QDF.Store_Select_new)
-	FROM '$(vL.QDF.filelist_tmp)'
-	(qvd);
+	FROM '$(vL.QDF.filelist_tmp)' (qvd);
+	let vL.QDF.MigrationDestination_tmp='$(vL.QDF.MigrationDestination)';
+	if not '$(vL.QDF.MigrationDestination)' = '' then
+	
+		if lower(subfield('$(vL.QDF.MigrationDestination)','.',-1))='$(vL.QDF.FormatSpec)' then //Check QVD, qvx, txt destination file, if non existing use same as source
+			let vL.QDF.MigrationDestination_tmp='$(vL.QDF.MigrationDestination)';
+			trace '### DF 9.QVDMigration.qvs will migrate to a single qvd file due to no trailing / at destination path, files could be overwritten';
+		else
+			// Identify Source qvd name and path and parse with destination path
+			LET vL.QDF.MigrationDestination_tmp=trim('$(vL.QDF.MigrationDestination)/'& mid('$(vL.QDF.filelist_tmp)', len(left ('$(vL.QDF.MigrationSource)',index('$(vL.QDF.MigrationSource)','/',-1)))));
+			let vL.QDF.MigrationDestination_tmp ='lib:/'&replace(mid(trim('$(vL.QDF.MigrationDestination_tmp)'),6,len('$(vL.QDF.MigrationDestination_tmp)')+6),'//','/'); //Remove any redundant slash in url
+			LET vL.QDF.MigrationDestination_tmp=left('$(vL.QDF.MigrationDestination_tmp)',(len('$(vL.QDF.MigrationDestination_tmp)')-4))&'.$(vL.QDF.FormatSpec)'; // Create correct file extension
+		endif
+	
 
-		if not '$(vL.QDF.MigrationDestination)' = '' then
-	
-			if lower(subfield('$(vL.QDF.MigrationDestination)','.',-1))='$(vL.QDF.FormatSpec)' then //Check QVD, qvx, txt destination file, if non existing use same as source
-				let vL.QDF.MigrationDestination_tmp='$(vL.QDF.MigrationDestination)';
-				trace '### DF 9.QVDMigration.qvs will migrate to a single qvd file due to no trailing / at destination path, files could be overwritten';
-			else
-				// Identify Source qvd name and path and parse with destination path
-				LET vL.QDF.MigrationDestination_tmp=trim('$(vL.QDF.MigrationDestination)/'& mid('$(vL.QDF.filelist_tmp)', len(left ('$(vL.QDF.MigrationSource)',index('$(vL.QDF.MigrationSource)','/',-1)))));
-				LET vL.QDF.MigrationDestination_tmp=left('$(vL.QDF.MigrationDestination_tmp)',(len('$(vL.QDF.MigrationDestination_tmp)')-4))&'.$(vL.QDF.FormatSpec)'; // Create correct file extension
-			endif
-	
+		//LET vL.QDF.FolderPath_tmp= left ('$(vL.QDF.MigrationDestination_tmp)',index('$(vL.QDF.MigrationDestination_tmp)','/',-1)); // Remove qvd file name to get folder names only
+			
+		if not '$(vL.QDF.QVDTag)'='' or not '$(vL.QDF.QVTableName_Suffix)'='' then //Transfer tags from source qvd + add suffix as tag 
+			comment table [$(vL.QDF.QVTableName)$(vL.QDF.QVTableName_Suffix)] with ',$(vL.QDF.QVDTag),$(vL.QDF.QVTableName_Suffix),' ; // add meta-tags
+		endif
 
-			LET vL.QDF.FolderPath_tmp= left ('$(vL.QDF.MigrationDestination_tmp)',index('$(vL.QDF.MigrationDestination_tmp)','/',-1)); // Remove qvd file name to get folder names only
-			$(Include=$(vG.SubPath)\6.CreateFolder.qvs);
-			call CreateFolder('$(vL.QDF.FolderPath_tmp)');	// Check if SubFolders it need to be created under destination folder	
-	
-			if not '$(vL.QDF.QVDTag)'='' or not '$(vL.QDF.QVTableName_Suffix)'='' then //Transfer tags from source qvd + add suffix as tag 
-				comment table [$(vL.QDF.QVTableName)$(vL.QDF.QVTableName_Suffix)] with ',$(vL.QDF.QVDTag),$(vL.QDF.QVTableName_Suffix),' ; // add meta-tags
-			endif
+			let vL.QDF.MigrationDestination_tmp ='lib:/'&replace(mid(trim('$(vL.QDF.MigrationDestination_tmp)'),6,len('$(vL.QDF.MigrationDestination_tmp)')+6),'//','/'); //Remove any redundant slash in url
 
 			Store * from [$(vL.QDF.QVTableName)$(vL.QDF.QVTableName_Suffix)] into '$(vL.QDF.MigrationDestination_tmp)' ($(vL.QDF.FormatSpec));
 			drop table [$(vL.QDF.QVTableName)$(vL.QDF.QVTableName_Suffix)];

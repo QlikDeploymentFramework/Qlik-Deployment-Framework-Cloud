@@ -13,20 +13,33 @@
   // Call reduceQVD('$(vL.QVDStagePath)','stageIVRData2.QVD');
 
  SUB reduceQVD (vL.QDF.Path, vL.QDF.File)
-  // Trace $(vL.QDF.Path);
-  // Trace $(vL.QDF.File);
+
+if '$(vL.QDF.File)' = '' then // identify if vL.QDF.File is used or qvd path is baked in with vL.QDF.Path
+  let vL.QDF.QVFile ='lib:/'&replace(mid(trim('$(vL.QDF.Path)'),6,len('$(vL.QDF.Path)')+6),'//','/'); //Remove any redundant slash in url
+  let vL.QDF.File='tmp_table'; //default tablename
+else
+  let vL.QDF.QVFile ='lib:/'&replace(mid(trim('$(vL.QDF.Path)/$(vL.QDF.File)'),6,len('$(vL.QDF.Path)/$(vL.QDF.File)')+6),'//','/'); //Remove any redundant slash in url
+endif 
+call vL.FileExist('$(vL.QDF.QVFile)');
+
+if vL.FileExist='true' then
+Trace '### Reduce datafile: $(vL.QDF.QVFile)';
 
   NoConcatenate
-  $(vL.QDF.File):
+  [$(vL.QDF.File)]:
   LOAD * Inline [
     EMPTY
   ];
 
-  STORE $(vL.QDF.File) into [$(vL.QDF.Path)$(vL.QDF.File)];
-  DROP Table $(vL.QDF.File);
+  STORE [$(vL.QDF.File)] into [$(vL.QDF.QVFile)];
+  DROP Table [$(vL.QDF.File)];
+
+endif
 
   SET vL.QDF.Path=;
   SET vL.QDF.File=;
+  SET vL.FileExist=;
+  SET vL.QDF.QVFile=;
 
 END SUB;
 

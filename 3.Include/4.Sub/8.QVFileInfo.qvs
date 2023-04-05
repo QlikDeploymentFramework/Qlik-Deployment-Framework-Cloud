@@ -16,6 +16,7 @@
 
 SUB QVFileInfo(vL.QDF.QVFile,vL.QDF.QVTableName);
 
+let vL.QDF.QVFile ='lib:/'&replace(mid(trim('$(vL.QDF.QVFile)'),6,len('$(vL.QDF.QVFile)')+6),'//','/'); //Remove any redundant slash in url
 
 if '$(vL.QDF.QVTableName)'='' then // If No TableName Exists Use QVFileInfo
 	SET vL.QDF.QVTableName = 'QVFileInfo';
