@@ -81,14 +81,8 @@ call LoadVariableCSV('$(vG.$(vL.QDF.SharedInclude)BaseVariablePath)/$(vL.QDF.Loa
 // Initiation of 4.Custom within home or shared container
 $(Include=$(vG.$(vL.QDF.SharedInclude)BaseVariablePath)/4.Custom.qvs); // Loading 4.Custom from current container
 
-
 SET vL.QDF.Foldername =;
 SET vL.QDF.DoDir=;
 SET vL.QDF.SubDir=;
 SET vL.QDF.SharedInclude=;
 SET vL.QDF.Home=;
-SET vvG.HomeContainer=;
-
-
-
-  
