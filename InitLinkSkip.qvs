@@ -22,5 +22,4 @@ endif
 // 99.LoadAll.qvs pre-loads QDF function-library within current container
 $(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\99.LoadAll.qvs); 
 
-SET vL.QDF.SharedInclude=; // Cleanup, 
-SET vvG.HomeContainer=; // Cleanup, 
+SET vL.QDF.SharedInclude=; // Cleanup,  
