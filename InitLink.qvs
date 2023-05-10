@@ -42,12 +42,12 @@ if not IsNull(filesize('$(vG.HomeContainer)/InitLink.qvs')) = -1 then // Home co
 for each vL.QDF.DoDir in dirlist ('$(vG.HomeContainer)')
          let vL.QDF.Foldername =purgechar(subfield('$(vL.QDF.DoDir)','.',-1), '/');
 			if  not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
-              LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)/';
+              LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)';
               trace 'Set Global Variable: $(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)';
                for each vL.QDF.SubDir in dirlist ('$(vL.QDF.DoDir)')
                let vL.QDF.Foldername =purgechar(subfield('$(vL.QDF.SubDir)','.',-1), '/');
                	if  not IsNull(filesize('$(vL.QDF.SubDir)/Info.txt')) = -1 then
-                	   LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.SubDir)/';
+                	   LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.SubDir)';
                		trace 'Set Global Variable: $(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)';
                 endif
                next vL.QDF.SubDir 

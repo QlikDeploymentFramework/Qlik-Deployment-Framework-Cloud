@@ -37,14 +37,14 @@ if '$(vL.RootPath)'= '' then // Use spaces as containers
 
 			if not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
 				if '$(vL.QDF.SingleFolder)'='' or '$(vL.QDF.SingleFolder)'='$(vL.QDF.Foldername)' then
-              		LET vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)/';
+              		LET vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)';
            			trace 'Set Global Variable: $(vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path)';
 			  	endif
                for each vL.QDF.SubDir in dirlist ('$(vL.QDF.DoDir)')
                		let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','.',-1);
                		if not IsNull(filesize('$(vL.QDF.SubDir)/Info.txt')) = -1 then
 						if '$(vL.QDF.SingleFolder)'='' or '$(vL.QDF.SingleFolder)'='$(vL.QDF.Foldername)' then
-                			LET vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path='$(vL.QDF.SubDir)/';
+                			LET vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path='$(vL.QDF.SubDir)';
                				trace 'Set Global Variable: $(vG.$(vL.QDF.Alias)$(vL.QDF.Foldername)Path)';
 						endif
                 	endif
