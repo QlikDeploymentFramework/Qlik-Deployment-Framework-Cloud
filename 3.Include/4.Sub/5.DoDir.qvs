@@ -55,11 +55,10 @@ else
 	LET vL.QDF.Specific_File_Type= '';
 	LET vL.QDF.Filename= '';
 endif
-//vL.QDF.Filename
 
 let vL.QDF.DoDirRootTmp ='lib:/'&replace(mid(trim('$(vL.QDF.DoDirRoot)'),6,len('$(vL.QDF.DoDirRoot)')+6),'//','/'); //Remove any redundant slash in url
 
-trace 'Folder $(vL.QDF.DoDirRootTmp) Filename $(vL.QDF.Filename)' ;
+//trace 'Folder $(vL.QDF.DoDirRootTmp) Filename $(vL.QDF.Filename)' ;
 
 if lower('$(vL.QDF.FoldersOnly)')='true' then // If folders only is used (vL.QDF.FoldersOnly) execute vL.QDF.DoDirTableName to add first folder
       call vL.QDF.DoDirTableName('$(vL.QDF.DoDirRootTmp)');
