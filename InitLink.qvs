@@ -34,7 +34,7 @@ Switch '$(vL.QDF.Home)' // identifing shared container
       SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
       SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
     default
-    SET vL.QDF.SharedInclude=''; // No shared folder used do not use spaces as app basepath
+    SET vL.QDF.SharedInclude=''; // No shared folder, use $(vG.HomeContainer) base path
 end switch   
 
 if not IsNull(filesize('$(vG.HomeContainer)/InitLink.qvs')) = -1 then // Home container used in cloud
@@ -85,5 +85,5 @@ $(Include=$(vG.$(vL.QDF.SharedInclude)BaseVariablePath)/4.Custom.qvs); // Loadin
 SET vL.QDF.Foldername =;
 SET vL.QDF.DoDir=;
 SET vL.QDF.SubDir=;
-SET vL.QDF.SharedInclude=;
+//SET vL.QDF.SharedInclude=;
 SET vL.QDF.Home=;

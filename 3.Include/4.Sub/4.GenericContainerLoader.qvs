@@ -22,10 +22,11 @@ else
 	trace '### QDF Info, Alias: $(vL.QDF.Alias) found, will replace: $(vL.QDF.ContainerName) prefix name' ;
 endif
 
-// Load container map and variables by using LoadContainerMap function
+// Load container map and variables by using LoadContainerMap function 
 // vL.ContainerFolderName, vL.ContainerPathName, vL.RootPath are all retrieved from LoadContainerMap sub function
+// $(vL.QDF.SharedInclude) is based on using shared space container or other container
 
-call LoadContainerMap('$(vG.SharedBaseVariablePath)/ContainerMap.csv','$(vL.QDF.ContainerName)'); // Using LoadContainerMap with special switches the Container links will be populated automatically
+call LoadContainerMap('$(vG.$(vL.QDF.SharedInclude)BaseVariablePath)/ContainerMap.csv','$(vL.QDF.ContainerName)'); // Using LoadContainerMap with special switches the Container links will be populated automatically
 
 // Base Search Path $(vG.BasePath) for this container
 if '$(vL.RootPath)'= '' then // Use spaces as containers
