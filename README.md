@@ -1,5 +1,5 @@
 # Qlik-Deployment-Framework (QDF) for Qlik Cloud (v.1.8 alfa)
-These scripts are specific for Qlik Cloud, meaning that you can not run Qlik Sense desktop, QlikView or Qlik Sense server together with these scripts. Qlik Cloud spaces can be used as containers as well as classic containers stored under external storage that is  mapped as a drive in Qlik Cloud.
+These scripts are specific for Qlik Cloud, do not run under Qlik Sense desktop, QlikView or Qlik Sense server with these scripts. Qlik Cloud spaces can be used as containers as well as (and together with) classic containers stored under external storage that is  mapped as a drive in Qlik Cloud.
 
 This is an early alfa with several bugs and limitations in Qlik Cloud. Use standard QDF containers and replace the scripts with these.  All QDF functions are loaded in during initiation but not all of functions are tested to work with Qlik Cloud.
 
@@ -7,11 +7,14 @@ This is an early alfa with several bugs and limitations in Qlik Cloud. Use stand
     - `SET vG.HomeContainer='lib://user:OneDrive - user/QDF_SaaS/Shared';`
     - `$(Include=$(vG.HomeContainer)\InitLink.qvs);`
 * In this release all container folders in external drives (folders you want QDF to identify as Global Variable path) need to include the **Info.txt** file, as this file identifies the folder as a Global path
-* External drives are really picky on trailing slash, for OneDrive no trailing slash is possible
-* To identify containers stored in external drives, the 'AltPath' to the external dirve and container root needs to be specified in `vG.SharedBaseVariablePath/ContainerMap.csv`
-* **Qlik Cloud spaces** as containers works but with limited subfolders, only global variables `vG.BasePath` and `vG.QVDPath` are generated and used. 
-    - Mapp QDF container -> space by adding space name in `Prefix` and `ContainerName` under `vG.SharedBaseVariablePath/ContainerMap.csv` (no `AltPath` are specified in container map)
 * Use `$(include=$(vG.HomeContainer)/InitLinkSkip.qvs);` to skip executing the initiation code that identifies related containers, this only works when initiation has executed successfully one time in the same location
+* External drives are really picky on trailing slash, for OneDrive no trailing slash is possible
+* To identify containers stored in external drives. Edit the shared `vG.SharedBaseVariablePath/ContainerMap.csv`add the external storage location, inlcuding container root in `AltPath` field as a URL, as seen below. Remember that its the URL to `QDF starting folder`, not the container itself (as the container name already exists under `ContainerName` field). Do not use Excel when editing as it make the map unreadable in QDF, use an editor or DeployTool instead.
+<img width="985" alt="image" src="https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework-Cloud/assets/23187088/b2f77e01-74a6-40a0-b979-d025ebd594f8">
+
+## Assign containers to Qlik Cloud Spaces
+Its possible to use Spaces as containers but with limited set of folders, only global variables generated for a space are `vG.BasePath` and `vG.QVDPath`. 
+    - Assign space as QDF container by typing space name under `Prefix` and `ContainerName` in shared container map `vG.SharedBaseVariablePath/ContainerMap.csv`. Leave `AltPath` empty as this is reserved for external storage location
 
 ## QDF is a set of Qlik scripts and utilities that enables: 
 Resource Sharing, Reuse, Organisation, Structure and Standards providing an effective and efficient Qlik deployment.
@@ -34,4 +37,3 @@ Qlik-Deployment-Framework GitHub repository contains Qlik Script code that resid
 - **3.Include/1.BaseVariable/ContainerMap.csv** --> Contains a list of the containers identified by QDF, this list need to be up to date for QDF to work properly. Qlik Cloud spaces can be used as containers as well as real containers stored under external storage that is  mapped as a drive in Qlik Cloud
 - **3.Include/2.Locale** --> contains locale files used during initiation
 - **3.Include/4.Sub**  --> contains the most important function library, read more under README https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework/tree/master/3.Include/4.Sub
-
