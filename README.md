@@ -14,7 +14,7 @@ This is an early alfa with several bugs and limitations in Qlik Cloud. Use stand
 
 ## Assign containers to Qlik Cloud Spaces
 Its possible to use Spaces as containers but with limited set of folders, only global variables generated for a space are `vG.BasePath` and `vG.QVDPath`. 
-    - Assign space to container by adding name of space in `Prefix` and `ContainerName` under `vG.SharedBaseVariablePath/ContainerMap.csv`, while leaving  `AltPath` blank as this one is reserved for external storage locations
+    - Assign space as QDF container by typing space name under `Prefix` and `ContainerName` in shared container map `vG.SharedBaseVariablePath/ContainerMap.csv`. Leave `AltPath` empty as this is reserved for external storage location
 
 ## QDF is a set of Qlik scripts and utilities that enables: 
 Resource Sharing, Reuse, Organisation, Structure and Standards providing an effective and efficient Qlik deployment.
