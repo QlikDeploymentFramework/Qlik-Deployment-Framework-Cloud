@@ -9,6 +9,7 @@ This is an early alfa with several bugs and limitations in Qlik Cloud. Use stand
 * In this release all container folders in external drives (folders you want QDF to identify as Global Variable path) need to include the **Info.txt** file, as this file identifies the folder as a Global path
 * External drives are really picky on trailing slash, for OneDrive no trailing slash is possible
 * To identify containers stored in external drives, the 'AltPath' to the external dirve and container root needs to be specified in `vG.SharedBaseVariablePath/ContainerMap.csv`. Do not use Excel when editing as it make the map unreadable in QDF, use an editor or DeployTool instead.
+<img width="985" alt="image" src="https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework-Cloud/assets/23187088/b2f77e01-74a6-40a0-b979-d025ebd594f8">
 * **Qlik Cloud spaces** as containers works but with limited subfolders, only global variables `vG.BasePath` and `vG.QVDPath` are generated and used. 
     - Mapp QDF container -> space by adding space name in `Prefix` and `ContainerName` under `vG.SharedBaseVariablePath/ContainerMap.csv` (no `AltPath` are specified in container map)
 * Use `$(include=$(vG.HomeContainer)/InitLinkSkip.qvs);` to skip executing the initiation code that identifies related containers, this only works when initiation has executed successfully one time in the same location
@@ -34,5 +35,3 @@ Qlik-Deployment-Framework GitHub repository contains Qlik Script code that resid
 - **3.Include/1.BaseVariable/ContainerMap.csv** --> Contains a list of the containers identified by QDF, this list need to be up to date for QDF to work properly. Qlik Cloud spaces can be used as containers as well as real containers stored under external storage that is  mapped as a drive in Qlik Cloud
 - **3.Include/2.Locale** --> contains locale files used during initiation
 - **3.Include/4.Sub**  --> contains the most important function library, read more under README https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework/tree/master/3.Include/4.Sub
-
-<img width="985" alt="image" src="https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework-Cloud/assets/23187088/b2f77e01-74a6-40a0-b979-d025ebd594f8">
