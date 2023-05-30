@@ -12,7 +12,7 @@ This is an early alfa with several bugs and limitations in Qlik Cloud. Use stand
 * To identify containers stored in external drives. Edit the shared `vG.SharedBaseVariablePath/ContainerMap.csv`add the external storage location, inlcuding container root in `AltPath` field as a URL, as seen below. Do not use Excel when editing as it make the map unreadable in QDF, use an editor or DeployTool instead.
 <img width="985" alt="image" src="https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework-Cloud/assets/23187088/b2f77e01-74a6-40a0-b979-d025ebd594f8">
 
-## Mapp Qlik Cloud Space as a container
+## Assign containers to Qlik Cloud Spaces
 Its possible to use Spaces as containers but with limited set of folders, only global variables generated for a space are `vG.BasePath` and `vG.QVDPath`. 
     - Mapp QDF container -> space by adding space name in `Prefix` and `ContainerName` under `vG.SharedBaseVariablePath/ContainerMap.csv` (no `AltPath` is specified)
 
