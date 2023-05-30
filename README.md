@@ -10,7 +10,7 @@ This is an early alfa with several bugs and limitations in Qlik Cloud. Use stand
 * External drives are really picky on trailing slash, for OneDrive no trailing slash is possible
 * To identify containers stored in external drives, the 'AltPath' to the external dirve and container root needs to be specified in `vG.SharedBaseVariablePath/ContainerMap.csv`. Do not use Excel when editing as it make the map unreadable in QDF, use an editor or DeployTool instead.
 <img width="985" alt="image" src="https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework-Cloud/assets/23187088/b2f77e01-74a6-40a0-b979-d025ebd594f8">
-**Qlik Cloud Space** as containers works but with limited set of folders, only global 'space' variables generated are `vG.BasePath` and `vG.QVDPath`. 
+* **Qlik Cloud Space** as containers works but with limited set of folders, only global 'space' variables generated are `vG.BasePath` and `vG.QVDPath`. 
     - Mapp QDF container -> space by adding space name in `Prefix` and `ContainerName` under `vG.SharedBaseVariablePath/ContainerMap.csv` (no `AltPath` is specified)
 * Use `$(include=$(vG.HomeContainer)/InitLinkSkip.qvs);` to skip executing the initiation code that identifies related containers, this only works when initiation has executed successfully one time in the same location
 
