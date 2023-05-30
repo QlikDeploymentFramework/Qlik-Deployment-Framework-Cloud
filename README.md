@@ -35,3 +35,4 @@ Qlik-Deployment-Framework GitHub repository contains Qlik Script code that resid
 - **3.Include/2.Locale** --> contains locale files used during initiation
 - **3.Include/4.Sub**  --> contains the most important function library, read more under README https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework/tree/master/3.Include/4.Sub
 
+<img width="985" alt="image" src="https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework-Cloud/assets/23187088/b2f77e01-74a6-40a0-b979-d025ebd594f8">
