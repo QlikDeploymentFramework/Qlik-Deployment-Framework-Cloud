@@ -8,7 +8,7 @@ This is an early alfa with several bugs and limitations in Qlik Cloud. Use stand
     - `$(Include=$(vG.HomeContainer)\InitLink.qvs);`
 * In this release all container folders in external drives (folders you want QDF to identify as Global Variable path) need to include the **Info.txt** file, as this file identifies the folder as a Global path
 * External drives are really picky on trailing slash, for OneDrive no trailing slash is possible
-* To identify containers stored in external drives, the 'AltPath' to the external dirve and container root needs to be specified in `vG.SharedBaseVariablePath/ContainerMap.csv`
+* To identify containers stored in external drives, the 'AltPath' to the external dirve and container root needs to be specified in `vG.SharedBaseVariablePath/ContainerMap.csv`. Do not use Excel when editing as it make the map unreadable in QDF, use an editor or DeployTool instead.
 * **Qlik Cloud spaces** as containers works but with limited subfolders, only global variables `vG.BasePath` and `vG.QVDPath` are generated and used. 
     - Mapp QDF container -> space by adding space name in `Prefix` and `ContainerName` under `vG.SharedBaseVariablePath/ContainerMap.csv` (no `AltPath` are specified in container map)
 * Use `$(include=$(vG.HomeContainer)/InitLinkSkip.qvs);` to skip executing the initiation code that identifies related containers, this only works when initiation has executed successfully one time in the same location
