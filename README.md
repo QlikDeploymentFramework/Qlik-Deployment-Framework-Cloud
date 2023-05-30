@@ -7,12 +7,14 @@ This is an early alfa with several bugs and limitations in Qlik Cloud. Use stand
     - `SET vG.HomeContainer='lib://user:OneDrive - user/QDF_SaaS/Shared';`
     - `$(Include=$(vG.HomeContainer)\InitLink.qvs);`
 * In this release all container folders in external drives (folders you want QDF to identify as Global Variable path) need to include the **Info.txt** file, as this file identifies the folder as a Global path
+* Use `$(include=$(vG.HomeContainer)/InitLinkSkip.qvs);` to skip executing the initiation code that identifies related containers, this only works when initiation has executed successfully one time in the same location
 * External drives are really picky on trailing slash, for OneDrive no trailing slash is possible
 * To identify containers stored in external drives, the 'AltPath' to the external dirve and container root needs to be specified in `vG.SharedBaseVariablePath/ContainerMap.csv`. Do not use Excel when editing as it make the map unreadable in QDF, use an editor or DeployTool instead.
 <img width="985" alt="image" src="https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework-Cloud/assets/23187088/b2f77e01-74a6-40a0-b979-d025ebd594f8">
-* **Qlik Cloud Space** as containers works but with limited set of folders, only global 'space' variables generated are `vG.BasePath` and `vG.QVDPath`. 
+
+## Mapp Qlik Cloud Space as a container
+Its possible to use Spaces as containers but with limited set of folders, only global variables generated for a space are `vG.BasePath` and `vG.QVDPath`. 
     - Mapp QDF container -> space by adding space name in `Prefix` and `ContainerName` under `vG.SharedBaseVariablePath/ContainerMap.csv` (no `AltPath` is specified)
-* Use `$(include=$(vG.HomeContainer)/InitLinkSkip.qvs);` to skip executing the initiation code that identifies related containers, this only works when initiation has executed successfully one time in the same location
 
 ## QDF is a set of Qlik scripts and utilities that enables: 
 Resource Sharing, Reuse, Organisation, Structure and Standards providing an effective and efficient Qlik deployment.
