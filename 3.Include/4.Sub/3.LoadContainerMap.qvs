@@ -7,12 +7,7 @@
 
 SUB LoadContainerMap(vL.QDF.ContainerMapPath,vL.QDF.SpecificVariable);
 
-//Reset vL.LoadContainerMapCount variable used to identify if two or more identical Variable Prefix exist
-SET vL.LoadContainerMapCount=;
-SET vL.QDF.ValidatedBasePath=;
-
 // Loading Container Map csv table as vL.temp_table_map
-
 unqualify ContainerPathName,Prefix,ContainerPathNameCount ; 
 vL.temp_table_map:
 REPLACE LOAD *
@@ -62,8 +57,6 @@ for vL.QDF.From_Loop = 0 to vL.QDF.To_Loop-1
 				
 				else // Several container Path exists, send error message
 				Trace '### QDF Warning, found duplication of $(vL.ContainerPathName), please correct';
-				//Reset vL.LoadContainerMapCount variable used to identify if two or more identical Variable Prefix exist
-				SET vL.LoadContainerMapCount='$(vL.ContainerPathName)';
 				SET vL.QDF.Exit= 'True'; // Exit For Loop
 			endif
 			exit for when '$(vL.QDF.Exit)'='True';
@@ -80,7 +73,6 @@ SET vL.QDF.To_Loop = ;
 SET vL.QDF.SpecificVariable = ;
 SET vL.QDF.Exit= ;
 SET vL.QDF.ContainerPathNameCount= ;
-SET vL.QDF.ValidatedBasePath=;
 SET vL.QDF.ContainerMapPath=;
 end sub
 

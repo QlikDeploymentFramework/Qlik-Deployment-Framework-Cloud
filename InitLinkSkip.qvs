@@ -4,22 +4,19 @@
    | will only work after previously successful initiation                                       
    | InitLinkSkip is used to bypass 1.Init.qvs for QlikView and Qlik Sense               
    |___________________________________________________________________________*/
-trace '### QDF Info, InitLinkSkip check if vG.BasePath exists'; //Writing information in log 
+trace '### QDF Info, InitLinkSkip validates vG.BasePath and vG.SharedBasePath'; //Writing information 
 
 if not IsNull(filesize('$(vG.SharedBasePath)/InitLink.qvs')) = -1  then 
     SET vL.QDF.SharedInclude='Shared';
-    //Set global variables for BasePath related to the space the app is executing from
-    SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
-    SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
-
+    
 elseif not IsNull(filesize('$(vG.BasePath)/InitLink.qvs')) = -1 then
 SET vL.QDF.SharedInclude='';
 else 
-    trace '### QDF warning, InitLink could not identify vG.Include path'; //Writing information in log   
+    trace '### QDF warning, could not identify a QDF container'; //Writing information   
 	trace '### QDF Warning, use InitLink.qvs to generate global variables';
 endif
 
 // 99.LoadAll.qvs pre-loads QDF function-library within current container
 $(Include=$(vG.$(vL.QDF.SharedInclude)SubPath)\99.LoadAll.qvs); 
 
-//SET vL.QDF.SharedInclude=; // Cleanup, 
+SET vL.QDF.SharedInclude=; // Cleanup, 

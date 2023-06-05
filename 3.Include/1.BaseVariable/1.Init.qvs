@@ -10,8 +10,6 @@ trace '### QDF Info, Initiation Started'; // Writing information
 // Remark or blank vL.QDF.LoadCustom to skip loading Variables during initiation
 set vL.QDF.LoadCustom='Custom.Variables.csv';
 
-
-
 //Set global variables for include scripts
 //Determin if it's shared scripts used, by setting vG.SharedInclude or vG.Include in script initiaiton
 LET vL.QDF.Home=lower(right('$(vG.HomeContainer)',6)); 
@@ -22,7 +20,6 @@ Switch '$(vL.QDF.Home)' // identifing shared container
       //Set global variables for BasePath related to the space the app is executing from
       SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
       SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
-	
 	case 'hared/' //Shared contains front-slash
 		SET vL.QDF.SharedInclude='Shared'; 
       //Set global variables for BasePath related to the space the app is executing from
@@ -33,8 +30,12 @@ Switch '$(vL.QDF.Home)' // identifing shared container
       //Set global variables for BasePath related to the space the app is executing from
       SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
       SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
-    default
-    SET vL.QDF.SharedInclude=''; // No shared folder used do not use spaces as app basepath
+   case '' //vG.HomeContainer container not found
+      SET vL.QDF.SharedInclude=''; // Remove shared folder
+      trace '### QDF warning, QDF could not resolve vG.HomeContainer'; //Writing information
+      trace '### QDF warning, preceding initiation, please add variable vG.HomeContainer with path to external QDF container'; //Writing information
+   default
+      SET vL.QDF.SharedInclude=''; // No shared folder, use $(vG.HomeContainer) base path
 end switch   
 
 if not IsNull(filesize('$(vG.HomeContainer)/InitLink.qvs')) = -1 then // Home container used in cloud
@@ -84,5 +85,5 @@ $(Include=$(vG.$(vL.QDF.SharedInclude)BaseVariablePath)/4.Custom.qvs); // Loadin
 SET vL.QDF.Foldername =;
 SET vL.QDF.DoDir=;
 SET vL.QDF.SubDir=;
-//SET vL.QDF.SharedInclude=;
+SET vL.QDF.SharedInclude=;
 SET vL.QDF.Home=;

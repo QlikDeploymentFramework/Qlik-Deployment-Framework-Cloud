@@ -22,6 +22,13 @@ else
 	trace '### QDF Info, Alias: $(vL.QDF.Alias) found, will replace: $(vL.QDF.ContainerName) prefix name' ;
 endif
 
+// identifing where to load container map from
+if not IsNull(filesize('$(vG.SharedBaseVariablePath)/ContainerMap.csv')) = -1  then 
+    SET vL.QDF.SharedInclude='Shared';
+else
+	SET vL.QDF.SharedInclude='';
+endif
+
 // Load container map and variables by using LoadContainerMap function 
 // vL.ContainerFolderName, vL.ContainerPathName, vL.RootPath are all retrieved from LoadContainerMap sub function
 // $(vL.QDF.SharedInclude) is based on using shared space container or other container
@@ -32,7 +39,7 @@ call LoadContainerMap('$(vG.$(vL.QDF.SharedInclude)BaseVariablePath)/ContainerMa
 if '$(vL.RootPath)'= '' then // Use spaces as containers
 		SET vG.$(vL.QDF.Alias)BasePath = 'lib://$(vL.ContainerFolderName):';
 		SET vG.$(vL.QDF.Alias)QVDPath = '$(vG.$(vL.QDF.Alias)BasePath)DataFiles/'; 
-	elseif not IsNull(filesize('$(vL.RootPath)$(vL.ContainerFolderName)/InitLink.qvs')) = -1 then // Use real containers in external storage
+	elseif not IsNull(filesize('$(vL.RootPath)$(vL.ContainerFolderName)/InitLink.qvs')) = -1 then // Use QDF containers from external storage
 		for each vL.QDF.DoDir in dirlist ('$(vL.RootPath)$(vL.ContainerFolderName)')
          let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','.',-1);
 
@@ -70,9 +77,10 @@ SET vL.QDF.BasePath=;
 SET vL.QDF.ContainerMapPath = ;
 SET vL.ContainerPathName=;
 SET vL.RootPath=;
-SET vL.FileExist=;
 SET vL.QDF.ContainerName=;
 SET vL.Comment =;
+SET vL.QDF.DoDir=;
+SET vL.QDF.SubDir=;
 SET vL.QDF.SingleFolder=;
 SET vL.QDF.SubStringSplitt=;
 SET vL.QDF.SubString=;
