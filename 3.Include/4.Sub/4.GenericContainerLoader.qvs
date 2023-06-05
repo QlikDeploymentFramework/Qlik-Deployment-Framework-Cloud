@@ -68,23 +68,16 @@ endif
 // Remove local variables
 
 SET vL.ContainerFolderName=;
-SET vL.QDF.PhysicalFolderName=;
-SET vL.QDF.VariablePrefix=;
-SET vL.QDF.VariableLoop=;
-SET vL.QDF.Subfolder=;
-set vL.QDF.VariableLoop=;
-SET vL.QDF.BasePath=;
-SET vL.QDF.ContainerMapPath = ;
 SET vL.ContainerPathName=;
 SET vL.RootPath=;
 SET vL.QDF.ContainerName=;
+SET vL.QDF.Foldername;
 SET vL.Comment =;
 SET vL.QDF.DoDir=;
 SET vL.QDF.SubDir=;
 SET vL.QDF.SingleFolder=;
-SET vL.QDF.SubStringSplitt=;
-SET vL.QDF.SubString=;
 SET vL.QDF.Alias=;
+SET vL.QDF.SharedInclude=;
 end sub
 
 SUB LCGV(vL.QDF.ContainerName_tmp,vL.QDF.SingleFolder_tmp,vL.QDF.Alias_tmp); // Alias for LoadContainerGlobalVariables

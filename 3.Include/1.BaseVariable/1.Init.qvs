@@ -39,7 +39,7 @@ Switch '$(vL.QDF.Home)' // identifing shared container
 end switch   
 
 if not IsNull(filesize('$(vG.HomeContainer)/InitLink.qvs')) = -1 then // Home container used in cloud
-
+LET vG.$(vL.QDF.SharedInclude)BasePath='$(vG.HomeContainer)'; // Set Home BasePath
 for each vL.QDF.DoDir in dirlist ('$(vG.HomeContainer)')
          let vL.QDF.Foldername =purgechar(subfield('$(vL.QDF.DoDir)','.',-1), '/');
 			if  not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
@@ -87,3 +87,4 @@ SET vL.QDF.DoDir=;
 SET vL.QDF.SubDir=;
 SET vL.QDF.SharedInclude=;
 SET vL.QDF.Home=;
+SET vL.QDF.LoadCustom=;
