@@ -24,13 +24,13 @@ Switch lower(right('$(vG.HomeContainer)',6)) // identifing shared container
       //Set global variables for BasePath related to the space the app is executing from
       SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
       SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
-      LET vG.$(vL.QDF.SharedInclude)BasePath=left('$(vG.HomeContainer)',len('$(vG.HomeContainer)')-1); // Set Home BasePath
+      LET vG.$(vL.QDF.SharedInclude)BasePath=left('$(vG.HomeContainer)',len('$(vG.HomeContainer)')-1); // Set Home BasePath remove slash due to SaaS limitations
 	case 'hared\' //Shared contains back-slash
 		SET vL.QDF.SharedInclude='Shared'; 
       //Set global variables for BasePath related to the space the app is executing from
       SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
       SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
-       LET vG.$(vL.QDF.SharedInclude)BasePath=left('$(vG.HomeContainer)',len('$(vG.HomeContainer)')-1); // Set Home BasePath
+      LET vG.$(vL.QDF.SharedInclude)BasePath=left('$(vG.HomeContainer)',len('$(vG.HomeContainer)')-1); // Set Home BasePath remove slash due to SaaS limitations
    case '' //vG.HomeContainer container not found
       SET vL.QDF.SharedInclude=''; // Remove shared folder
       trace '### QDF warning, QDF could not resolve vG.HomeContainer'; //Writing information
