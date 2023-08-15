@@ -24,13 +24,13 @@ Switch lower(right('$(vG.HomeContainer)',6)) // identifing shared container
       //Set global variables for BasePath related to the space the app is executing from
       SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
       SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
-      LET vG.$(vL.QDF.SharedInclude)BasePath=left('$(vG.HomeContainer)',len('$(vG.HomeContainer)')-1); // Set Home BasePath
+      LET vG.$(vL.QDF.SharedInclude)BasePath=left('$(vG.HomeContainer)',len('$(vG.HomeContainer)')-1); // Set Home BasePath remove slash due to SaaS limitations
 	case 'hared\' //Shared contains back-slash
 		SET vL.QDF.SharedInclude='Shared'; 
       //Set global variables for BasePath related to the space the app is executing from
       SET vG.BasePath= 'lib://:'; // same as current space lib: // [space]: Datafiles / *. qvd
       SET vG.QVDPath= '$(vG.BasePath)DataFiles/';
-       LET vG.$(vL.QDF.SharedInclude)BasePath=left('$(vG.HomeContainer)',len('$(vG.HomeContainer)')-1); // Set Home BasePath
+      LET vG.$(vL.QDF.SharedInclude)BasePath=left('$(vG.HomeContainer)',len('$(vG.HomeContainer)')-1); // Set Home BasePath remove slash due to SaaS limitations
    case '' //vG.HomeContainer container not found
       SET vL.QDF.SharedInclude=''; // Remove shared folder
       trace '### QDF warning, QDF could not resolve vG.HomeContainer'; //Writing information
@@ -40,20 +40,29 @@ Switch lower(right('$(vG.HomeContainer)',6)) // identifing shared container
       LET vG.BasePath='$(vG.HomeContainer)'; // Set Home BasePath
 end switch   
 
-if not IsNull(filesize('$(vG.$(vL.QDF.SharedInclude)BasePath)/InitLink.qvs')) = -1 then // Home container used in cloud
+if not IsNull(filesize('$(vG.$(vL.QDF.SharedInclude)BasePath)/InitLink.qvs')) = -1 then // Validate container in cloud storage
 for each vL.QDF.DoDir in dirlist ('$(vG.$(vL.QDF.SharedInclude)BasePath)')
-         let vL.QDF.Foldername =purgechar(subfield('$(vL.QDF.DoDir)','.',-1), '/');
+
 			if  not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
-              LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)';
-              trace 'Set Global Variable: $(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)';
+            if len(subfield('$(vL.QDF.DoDir)','.',-1)) < 16 then //### QDF identifies what delimiter to use for variable name (16 is max length of any QDF folder)
+                let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','.',-1);
+            else
+                let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','/',-1);
+            endif
+               let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','$(vL.QDF.Delimiter)',-1);
+              LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)'; //Generating global variable
+              trace '### Global Variable: vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path';
                for each vL.QDF.SubDir in dirlist ('$(vL.QDF.DoDir)')
-               let vL.QDF.Foldername =purgechar(subfield('$(vL.QDF.SubDir)','.',-1), '/');
                	if  not IsNull(filesize('$(vL.QDF.SubDir)/Info.txt')) = -1 then
-                	   LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.SubDir)';
-               		trace 'Set Global Variable: $(vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path)';
+                     if len(subfield('$(vL.QDF.SubDir)','.',-1)) < 16 then //### QDF identifies what delimiter to use for variable name (16 is max length of any QDF folder)
+                         let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','.',-1);
+                     else
+                         let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','/',-1);
+                     endif
+                	   LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.SubDir)'; //Generating global variable
+               		trace '### Global Variable: vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path';
                 endif
                next vL.QDF.SubDir 
-                
 			endif
 next vL.QDF.DoDir
 else 
