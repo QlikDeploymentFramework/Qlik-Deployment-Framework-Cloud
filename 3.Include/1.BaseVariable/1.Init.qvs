@@ -45,11 +45,10 @@ for each vL.QDF.DoDir in dirlist ('$(vG.$(vL.QDF.SharedInclude)BasePath)')
 
 			if  not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
             if len(subfield('$(vL.QDF.DoDir)','.',-1)) < 16 then //### QDF identifies what delimiter to use for variable name (16 is max length of any QDF folder)
-                let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','.',-1);
+                let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','.',-1);
             else
-                let vL.QDF.Foldername =subfield('$(vL.QDF.SubDir)','/',-1);
+                let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','/',-1);
             endif
-               let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','$(vL.QDF.Delimiter)',-1);
               LET vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path='$(vL.QDF.DoDir)'; //Generating global variable
               trace '### Global Variable: vG.$(vL.QDF.SharedInclude)$(vL.QDF.Foldername)Path';
                for each vL.QDF.SubDir in dirlist ('$(vL.QDF.DoDir)')
