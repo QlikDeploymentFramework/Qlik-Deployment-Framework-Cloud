@@ -1,7 +1,7 @@
 ;
 /*  ___________________________________________________________________________
-   | Qlik Deployment Framework InitLink.qvs    
-   | InitLink.qvs is the container identifier                                                   
+   | Qlik Deployment Framework InitLink.qvs 1.Init.qvs    
+   | InitLink.qvs and 1.Init.qvs are container identifier (identical code 1.Init is legacy)                                                 
    |___________________________________________________________________________*/
    
 trace '### QDF Info, Initiation Started'; // Writing information
@@ -44,7 +44,7 @@ if not IsNull(filesize('$(vG.$(vL.QDF.SharedInclude)BasePath)/InitLink.qvs')) = 
 for each vL.QDF.DoDir in dirlist ('$(vG.$(vL.QDF.SharedInclude)BasePath)')
 
 			if  not IsNull(filesize('$(vL.QDF.DoDir)/Info.txt')) = -1 then
-            if len(subfield('$(vL.QDF.DoDir)','.',-1)) < 16 then //### QDF identifies what delimiter to use for variable name (16 is max length of any QDF folder)
+            if len(subfield('$(vL.QDF.DoDir)','.',-1)) < 12 then //### QDF identifies what delimiter to use for variable name (16 is max length of any QDF folder)
                 let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','.',-1);
             else
                 let vL.QDF.Foldername =subfield('$(vL.QDF.DoDir)','/',-1);
