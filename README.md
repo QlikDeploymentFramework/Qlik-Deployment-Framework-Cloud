@@ -18,7 +18,7 @@ Its possible to use Spaces as containers but with limited set of folders, only g
 
 ## Containers without number and devider
 To be compatible with Sharepoint storage its now possible to use container folders that does not contain number and devider (like 1.). Just take a standard container and remove numbers and deviders on all  subfolders, QDF initiation should identify and resolve folders as GlobalVariables anyhow.
-<img width="400" alt="image" src="https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework-Cloud/assets/23187088/825ac094-c122-4ba5-a191-c7e2a342e304">
+<img width="200" alt="image" src="https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework-Cloud/assets/23187088/825ac094-c122-4ba5-a191-c7e2a342e304">
 
 ## QDF is a set of Qlik scripts and utilities that enables: 
 Resource Sharing, Reuse, Organisation, Structure and Standards providing an effective and efficient Qlik deployment.
