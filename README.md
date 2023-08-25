@@ -16,6 +16,10 @@ This is an early alfa with several bugs and limitations in Qlik Cloud. Use stand
 Its possible to use Spaces as containers but with limited set of folders, only global variables generated for a space are `vG.BasePath` and `vG.QVDPath`. 
     - Assign space as QDF container by typing space name under `Prefix` and `ContainerName` in shared container map `vG.SharedBaseVariablePath/ContainerMap.csv`. Leave `AltPath` empty as this is reserved for external storage location
 
+## Containers without number and devider
+To be compatible with Sharepoint storage its now possible to use container folders that does not contain number and devider (like 1.). Just take a standard container and remove numbers and deviders on all  subfolders, QDF initiation should identify and resolve folders as GlobalVariables anyhow.
+https://github.com/QlikDeploymentFramework/Qlik-Deployment-Framework-Cloud/assets/23187088/825ac094-c122-4ba5-a191-c7e2a342e304
+
 ## QDF is a set of Qlik scripts and utilities that enables: 
 Resource Sharing, Reuse, Organisation, Structure and Standards providing an effective and efficient Qlik deployment.
 Qlik-Deployment-Framework content is available at https://community.qlik.com/groups/qlikview-deployment-framework
