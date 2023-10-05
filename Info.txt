@@ -1,13 +1,11 @@
 //  ____________________________________________________________
 // |      Deployment Framework Path Info txt                   |
-// | Contains information folder purpose and base variable     |
+// | Contains information folder purpose and base folder       |
 // |  All path are based on vG.BasePath                        |
 // |___________________________________________________________|
 
-// vG.BaseVariable points to 1.BaseVariable folder
-// This folder contains 1.Init.qvs Include scripts to initiate Deployment framework in the qvw or qvf
-// the first Include should always be 1.Init.qvs
-// Example: $(Include=..\..\..\3.include\1.basevariable\1.init.qvs);
+// vG.BasePath is the container base folder, all container global variables are based upon this
+// VG.BasePath is often set during script initiation using "set vG.HomeContainer='path'"
 
-Global Variable = vG.BaseVariablePath
-Shared Global Variable= vG.SharedBaseVariablePath
+Global Variable = vG.BasePath
+Shared Global Variable= vG.SharedBasePath
