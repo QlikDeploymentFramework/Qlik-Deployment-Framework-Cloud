@@ -1,7 +1,10 @@
-# Qlik-Deployment-Framework (QDF) for Qlik Cloud (v.1.8 alfa)
+# Qlik-Deployment-Framework (QDF) for Qlik Cloud (v.1.8 beta)
 These scripts are specific for Qlik Cloud, do not run under Qlik Sense desktop, QlikView or Qlik Sense server with these scripts. Qlik Cloud spaces can be used as containers as well as (and together with) classic containers stored under external storage that is  mapped as a drive in Qlik Cloud.
 
-This is an early alfa with several bugs and limitations in Qlik Cloud. Use standard QDF containers and replace the scripts with these.  All QDF functions are loaded in during initiation but not all of functions are tested to work with Qlik Cloud.
+This is now in beta. Initiation (InitLink.qvs) has been tested and validated. Sub functions has been adapted for Qlik Cloud. Still lacking testing and validation from community
+
+* Use standard QDF containers and replace the sub functions and initiation scripts with Qlik-Deployment-Framework-Cloud
+* All the updated Qlik-Deployment-Framework-Cloud functions are loaded in during initiation (InitLink.qvs)
 
 * **An external Shared container is a must** containing these Qlik Cloud script (replacing older QDF container scripts) in an external storage. This container is need to initiate QDF using Qlik Sense reload script, using **vG.HomeContainer** as seen below:
     - `SET vG.HomeContainer='lib://user:OneDrive - user/QDF_SaaS/Shared';`
